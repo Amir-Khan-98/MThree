@@ -10,7 +10,7 @@ public class NewOrderSingle implements Serializable
 	public float price;
 	public Instrument instrument;
 
-	public NewOrderSingle(int size,float price,Instrument instrument)
+	public NewOrderSingle(int size, float price, Instrument instrument)
 	{
 		this.size=size;
 		this.price=price;
