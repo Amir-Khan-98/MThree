@@ -10,17 +10,17 @@ public class Main{
 	public static void main(String[] args) throws IOException{
 		System.out.println("TEST: this program tests ordermanager");
 
-		//start sample clients
+		// start sample clients
 		MockClient c1=new MockClient("Client 1",2000);
 		c1.start();
 		(new MockClient("Client 2",2001)).start();
 		
-		//start sample routers
+		// start sample routers
 		(new SampleRouter("Router LSE",2010)).start();
 		(new SampleRouter("Router BATE",2011)).start();
 	
 		(new Trader("Trader James",2020)).start();
-		//start order manager
+		// start order manager
 		InetSocketAddress[] clients={new InetSocketAddress("localhost",2000),
 		                     new InetSocketAddress("localhost",2001)};
 		InetSocketAddress[] routers={new InetSocketAddress("localhost",2010),
@@ -40,17 +40,17 @@ class MockClient extends Thread{
 		try {
 			SampleClient client=new SampleClient(port);
 			if(port==2000){
-				//TODO why does this take an arg?
+				// TODO why does this take an arg?
 				client.sendOrder(null);
 				int id=client.sendOrder(null);
-				//TODO client.sendCancel(id);
+				// TODO client.sendCancel(id);
 				client.messageHandler();
 			}else{
 				client.sendOrder(null);
 				client.messageHandler();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			//  TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -72,7 +72,7 @@ class MockOM extends Thread{
 	@Override
 	public void run(){
 		try{
-			//In order to debug constructors you can do F5 F7 F5
+			// In order to debug constructors you can do F5 F7 F5
 			new OrderManager(routers,clients,trader,liveMarketData);
 		}catch(IOException | ClassNotFoundException | InterruptedException ex){
 			Logger.getLogger(MockOM.class.getName()).log(Level.SEVERE,null,ex);

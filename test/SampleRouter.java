@@ -23,7 +23,7 @@ public class SampleRouter extends Thread implements Router{
 	ObjectInputStream is;
 	ObjectOutputStream os;
 	public void run(){
-		//OM will connect to us
+		// OM will connect to us
 		try {
 			omConn=ServerSocketFactory.getDefault().createServerSocket(port).accept();
 			while(true){
@@ -40,14 +40,14 @@ public class SampleRouter extends Thread implements Router{
 				}
 			}
 		} catch (IOException | ClassNotFoundException | InterruptedException e) {
-			// TODO Auto-generated catch block
+			//  TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	@Override
-	public void routeOrder(int id,int sliceId,int size,Instrument i) throws IOException, InterruptedException{ //MockI.show(""+order);
+	public void routeOrder(int id,int sliceId,int size,Instrument i) throws IOException, InterruptedException{ // MockI.show(""+order);
 		int fillSize=RANDOM_NUM_GENERATOR.nextInt(size);
-		//TODO have this similar to the market price of the instrument
+		// TODO have this similar to the market price of the instrument
 		double fillPrice=199*RANDOM_NUM_GENERATOR.nextDouble();
 		Thread.sleep(42);
 		os=new ObjectOutputStream(omConn.getOutputStream());
@@ -60,7 +60,7 @@ public class SampleRouter extends Thread implements Router{
 	}
 
 	@Override
-	public void sendCancel(int id,int sliceId,int size,Instrument i){ //MockI.show(""+order);
+	public void sendCancel(int id,int sliceId,int size,Instrument i){ // MockI.show(""+order);
 	}
 	@Override
 	public void priceAtSize(int id, int sliceId,Instrument i, int size) throws IOException{
