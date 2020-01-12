@@ -5,6 +5,7 @@ import OrderManager.Order;
 import Ref.Instrument;
 
 // TODO this should really be in its own thread
+// I think just make the class extend thread or implement runnable and then put setPrice logic in the run method.
 public class SampleLiveMarketData implements LiveMarketData
 {
     private static final Random RANDOM_NUM_GENERATOR = new Random();

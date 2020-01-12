@@ -17,6 +17,7 @@ public class Instrument implements Serializable{
 		return ric.ric;
 	}
 }
+// shares
 class EqInstrument extends Instrument{
 	Date exDividend;
 
@@ -24,6 +25,7 @@ class EqInstrument extends Instrument{
 		super(ric);
 	}
 }
+// future
 class FutInstrument extends Instrument{
 	Date expiry;
 	Instrument underlier;
