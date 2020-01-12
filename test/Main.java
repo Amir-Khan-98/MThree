@@ -50,19 +50,21 @@ class MockClient extends Thread
             SampleClient client = new SampleClient(port);
             if (port == 2000)
             {
-                // TODO why does this take an arg?
-                client.sendOrder(null);
-                int id = client.sendOrder(null);
+                // done "why does this take an arg?"
+                client.sendOrder();
+                int id = client.sendOrder();
                 // TODO client.sendCancel(id);
                 client.messageHandler();
-            } else
+            }
+            else
             {
-                client.sendOrder(null);
+                client.sendOrder();
                 client.messageHandler();
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
-            //  TODO Auto-generated catch block
+            System.out.println("IOException Occured. Message: "+e.getMessage());
             e.printStackTrace();
         }
 
@@ -92,7 +94,8 @@ class MockOM extends Thread
         {
             // In order to debug constructors you can do F5 F7 F5
             new OrderManager(routers, clients, trader, liveMarketData);
-        } catch (IOException | ClassNotFoundException | InterruptedException ex)
+        }
+        catch (IOException | ClassNotFoundException | InterruptedException ex)
         {
             Logger.getLogger(MockOM.class.getName()).log(Level.SEVERE, null, ex);
         }
