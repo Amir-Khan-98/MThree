@@ -23,10 +23,16 @@ public class Main
 
         (new Trader("Trader James", 2020)).start();
         // start order manager
+
+        //Creating the clients here
         InetSocketAddress[] clients = {new InetSocketAddress("localhost", 2000),
                 new InetSocketAddress("localhost", 2001)};
+
+        //Creating the routers here
         InetSocketAddress[] routers = {new InetSocketAddress("localhost", 2010),
                 new InetSocketAddress("localhost", 2011)};
+
+        //Create the trader here
         InetSocketAddress trader = new InetSocketAddress("localhost", 2020);
         LiveMarketData liveMarketData = new SampleLiveMarketData(null);
         (new MockOM("Order Manager", routers, clients, trader, liveMarketData)).start();
