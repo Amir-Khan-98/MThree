@@ -40,7 +40,7 @@ public class SampleRouter extends Thread implements Router
                 {
                     is = new ObjectInputStream(omConn.getInputStream());
 
-                    // Router.api is just a placeholder for what method should be called.
+                    // Router. is just a placeholder for what method should be called.
                     Router.api methodName = (Router.api) is.readObject();
                     System.out.println("Order Router recieved method call for:" + methodName);
                     switch (methodName)

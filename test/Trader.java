@@ -44,7 +44,7 @@ public class Trader extends Thread implements TradeScreen
                     // Reads in the message from the stream.
                     api method = (api) is.readObject();
                     System.out.println(Thread.currentThread().getName() + " calling: " + method);
-
+                    System.out.println("Received input from stream, object ");
                     // Depending on the stream input, it will perform one of the following methods.
                     switch (method)
                     {
