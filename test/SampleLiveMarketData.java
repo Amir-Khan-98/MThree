@@ -10,6 +10,7 @@ public class SampleLiveMarketData implements LiveMarketData
 {
 
     //First Commit of the Branch
+    // Second commit of the branch
     private static final Random RANDOM_NUM_GENERATOR = new Random();
 
     public void setPrice(Order o)
