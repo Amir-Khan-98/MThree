@@ -5,17 +5,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.IntSummaryStatistics;
 import java.util.Map;
 
 import Database.Database;
 import LiveMarketData.LiveMarketData;
 import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
-import OrderRouter.Router.api;
 import TradeScreen.TradeScreen;
 
 public class OrderManager
@@ -155,7 +151,8 @@ public class OrderManager
 
     private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException
     {
-        orders.put(id, new Order(clientId, clientOrderId, nos.instrument, nos.size));
+        Order order = new Order(clientId, clientOrderId, nos.instrument, nos.size);
+        orders.put(order.getOrderId(), order);
         // send a message to the client with 39=A; // OrdStatus is Fix 39, 'A' is 'Pending New'
         ObjectOutputStream os = new ObjectOutputStream(clients[clientId].getOutputStream());
         // newOrderSingle acknowledgement
@@ -163,7 +160,7 @@ public class OrderManager
         os.writeObject("11=" + clientOrderId + ";35=A;39=A;");
         os.flush();
 
-        sendOrderToTrader(id, orders.get(id), TradeScreen.api.newOrder);
+        sendOrderToTrader(order.getOrderId(), orders.get(id), TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
         id++;
@@ -171,10 +168,10 @@ public class OrderManager
 
     private void sendOrderToTrader(int orderId, Order o, Object method) throws IOException
     {
+        OrderPacket orderPacket = new OrderPacket(orderId,o,method);
         ObjectOutputStream ost = new ObjectOutputStream(trader.getOutputStream());
-        ost.writeObject(method);
-        ost.writeInt(orderId);
-        ost.writeObject(o);
+
+        ost.writeObject(orderPacket);
         ost.flush();
     }
 

@@ -41,28 +41,36 @@ public class Trader extends Thread implements TradeScreen
                 {
                     is = new ObjectInputStream(s);  // TODO check if we need to create each time. this will block if no data, but maybe we can still try to create it once instead of repeatedly
 
+                    OrderPacket packet = (OrderPacket) is.readObject();
                     // Reads in the message from the stream.
-                    api method = (api) is.readObject();
+                    long orderID = packet.getOrderId();
+                    Order currentOrder = packet.getOrder();
+                    api method = (api) packet.getMethod();
+
+                    System.out.println("CURRENT ID: "+orderID+" Current order: "+currentOrder.toString()+" Current method: "+method);
+
                     System.out.println(Thread.currentThread().getName() + " calling: " + method);
+
+
 
                     // Depending on the stream input, it will perform one of the following methods.
                     switch (method)
                     {
                         case newOrder:
-                            newOrder(is.readInt(), (Order) is.readObject());
+                            newOrder(packet.getOrderId(),packet.getOrder());
                             break;
                         case price:
-                            price(is.readInt(), (Order) is.readObject());
+                            price(packet.getOrderId(),packet.getOrder());
                             break;
                         case cross:
-                            is.readInt();
-                            is.readObject();
-                            // We need to create the cross(is.readInt(), (Order) is.readObject()) method to be used here.
+                            packet.getOrderId();
+                            packet.getOrder();
+                            // We need to create the cross(packet.getOrderId(), packet.getOrder()) method to be used here.
                             break; // TODO
                         case fill:
-                            is.readInt();
-                            is.readObject();
-                            // We need to create the fill(is.readInt(), (Order) is.readObject()) method to be used here.
+                            packet.getOrderId();
+                            packet.getOrder();
+                            // We need to create the fill(packet.getOrderId(), packet.getOrder()) method to be used here.
                             break; // TODO
                     }
                 }
@@ -126,14 +134,11 @@ public class Trader extends Thread implements TradeScreen
         // TODO should update the trade screen
         // TradeScreen.api....
         Thread.sleep(2134);
-        if(orders.containsKey(id))
-        {
+        if (orders.containsKey(id)){
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
             sliceOrder(id, (int) orders.get(id).sizeRemaining() / 2);
-        }
-        else
-        {
+        }else
             System.out.println("Order with id: "+id+" doesnt exist in Trader: "+this.getName());
-        }
+
     }
 }

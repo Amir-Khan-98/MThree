@@ -26,12 +26,17 @@ public class Order implements Serializable
 
 	public Order(long clientId, long clientOrderID, Instrument instrument, int size)
 	{
+		this.orderId = OrderIDTracker.getInstance().getNewID();
 		this.clientOrderID = clientOrderID;
 		this.size = size;
 		this.clientId = clientId;
 		this.instrument = instrument;
 		fills = new ArrayList<Fill>();
 		slices = new ArrayList<Order>();
+	}
+
+	public String toString(){
+		return "Instrument: "+getInstrument().toString();
 	}
 
 	public int sliceSizes()
