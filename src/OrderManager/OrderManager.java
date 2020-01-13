@@ -101,7 +101,10 @@ public class OrderManager
                         case "newOrderSingle":
                             newOrder(clientId, is.readInt(), (NewOrderSingle) is.readObject());
                             break;
-                        // TODO create a default case which errors with "Unknown message type"+...
+                        // create a default case which errors with "Unknown message type"+...
+                        default:
+                            System.err.println("Unknown Message type!");
+                            break;
                     }
                 }
             }
