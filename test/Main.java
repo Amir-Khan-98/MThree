@@ -34,9 +34,7 @@ public class Main
 
         //Create the trader here
         InetSocketAddress trader = new InetSocketAddress("localhost", 2020);
-
-        LiveMarketData liveMarketData = new SampleLiveMarketData();
-
+        LiveMarketData liveMarketData = new SampleLiveMarketData(null);
         (new MockOM("Order Manager", routers, clients, trader, liveMarketData)).start();
     }
 }
