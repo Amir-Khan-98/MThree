@@ -5,17 +5,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.IntSummaryStatistics;
 import java.util.Map;
 
 import Database.Database;
 import LiveMarketData.LiveMarketData;
 import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
-import OrderRouter.Router.api;
 import TradeScreen.TradeScreen;
 
 public class OrderManager
@@ -51,9 +47,8 @@ public class OrderManager
         return null;
     }
 
-    // @param args the command line arguments
-    public OrderManager(InetSocketAddress[] orderRouters, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData) throws IOException, ClassNotFoundException, InterruptedException
-    {
+    public void createConnections(InetSocketAddress[] orderRouters, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData) throws InterruptedException {
+
         this.liveMarketData = liveMarketData;
         this.trader = connect(trader);
         // for the router connections, copy the input array into our object field.
@@ -76,12 +71,20 @@ public class OrderManager
             this.clients[i] = connect(location);
             i++;
         }
+    }
+
+    // @param args the command line arguments
+    public OrderManager(InetSocketAddress[] orderRouters, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData) throws IOException, ClassNotFoundException, InterruptedException
+    {
+
+        createConnections(orderRouters, clients,trader, liveMarketData);
+
 
         int clientId, routerId;
         Socket client, router;
+
         // main loop, wait for a message, then process it
-        while (true)
-        {
+        while (true) {
 
             // TODO this is pretty cpu intensive, use a more modern polling/interrupt/select approach
             // we want to use the arrayindex as the clientId, so use traditional for loop instead of foreach
@@ -101,7 +104,10 @@ public class OrderManager
                         case "newOrderSingle":
                             newOrder(clientId, is.readInt(), (NewOrderSingle) is.readObject());
                             break;
-                        // TODO create a default case which errors with "Unknown message type"+...
+                        // create a default case which errors with "Unknown message type"+...
+                        default:
+                            System.err.println("Unknown Message type!");
+                            break;
                     }
                 }
             }
@@ -214,7 +220,7 @@ public class OrderManager
 
         if (sizeRemaining > 0)
         {
-            routeOrder(orderId, sliceId, sizeRemaining, slice);
+            routeOrderToRouter(orderId, sliceId, sizeRemaining, slice);
         }
     }
 
@@ -258,7 +264,7 @@ public class OrderManager
         sendOrderToTrader(id, o, TradeScreen.api.fill);
     }
 
-    private void routeOrder(int id, int sliceId, long size, Order order) throws IOException
+    private void routeOrderToRouter(int id, int sliceId, long size, Order order) throws IOException
     {
         for (Socket r : orderRouters)
         {

@@ -72,14 +72,22 @@ public class SampleRouter extends Thread implements Router
     }
 
     @Override
+
+    /**
+     * This class is used to communicate with the OrderManager
+     * */
     public void routeOrder(int id, int sliceId, int size, Instrument i) throws IOException, InterruptedException
     {
         // MockI.show(""+order);
         int fillSize = RANDOM_NUM_GENERATOR.nextInt(size);
+
         // TODO have this similar to the market price of the instrument
         // Instead of fillPrice being 199 * 0-1, make it similar to the actual price of the instrument passed into the method? (I assume)
         double fillPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
         Thread.sleep(42);
+
+
+        //Write and flush
         os = new ObjectOutputStream(omConn.getOutputStream());
         os.writeObject("newFill");
         os.writeInt(id);
