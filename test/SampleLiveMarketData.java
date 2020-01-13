@@ -20,6 +20,8 @@ public class SampleLiveMarketData extends Thread implements LiveMarketData
 
     private void setPrice()
     {
+        // In the case of setPrice being called twice simultaneously, the synchronized block forces only one setPrice() call at a time.
+        // Otherwise could get a stale price (no longer accurate);
         synchronized (this.order)
         {
             this.order.initialMarketPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
@@ -31,17 +33,22 @@ public class SampleLiveMarketData extends Thread implements LiveMarketData
     {
         // Old set price method!
         System.out.println("SampleLiveMarketData run method called.");
-        setPrice();
+        if(this.order == null)
+        {
+            setPrice();
+        }
+        else
+        {
+            System.out.println("Cannot set price, no order provided! (null)");
+        }
+
     }
 
     @Override
     public void setPrice(Order o)
     {
         this.order = o;
-        synchronized (this.order)
-        {
-            setPrice();
-        }
+        setPrice();
     }
 
 }
