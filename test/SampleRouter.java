@@ -35,9 +35,12 @@ public class SampleRouter extends Thread implements Router
             omConn = ServerSocketFactory.getDefault().createServerSocket(port).accept();
             while (true)
             {
+                // .available returns the estimated number of bytes to be read.
                 if (0 < omConn.getInputStream().available())
                 {
                     is = new ObjectInputStream(omConn.getInputStream());
+
+                    // Router.api is just a placeholder for what method should be called.
                     Router.api methodName = (Router.api) is.readObject();
                     System.out.println("Order Router recieved method call for:" + methodName);
                     switch (methodName)
@@ -49,14 +52,21 @@ public class SampleRouter extends Thread implements Router
                             priceAtSize(is.readInt(), is.readInt(), (Instrument) is.readObject(), is.readInt());
                             break;
                     }
-                } else
+                }
+                else
                 {
                     Thread.sleep(100);
                 }
             }
-        } catch (IOException | ClassNotFoundException | InterruptedException e)
+        }
+        catch (IOException | ClassNotFoundException | InterruptedException e)
         {
-            //  TODO Auto-generated catch block
+            if(e.getClass() == IOException.class)
+                System.out.println("IOException occurred, message: "+e.getMessage());
+            if(e.getClass() == ClassNotFoundException.class)
+                System.out.println("ClassNotFoundException occurred, message: "+e.getMessage());
+            if(e.getClass() == InterruptedException.class)
+                System.out.println("InterruptedException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }
     }
@@ -67,6 +77,7 @@ public class SampleRouter extends Thread implements Router
         // MockI.show(""+order);
         int fillSize = RANDOM_NUM_GENERATOR.nextInt(size);
         // TODO have this similar to the market price of the instrument
+        // Instead of fillPrice being 199 * 0-1, make it similar to the actual price of the instrument passed into the method? (I assume)
         double fillPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
         Thread.sleep(42);
         os = new ObjectOutputStream(omConn.getOutputStream());
@@ -75,6 +86,8 @@ public class SampleRouter extends Thread implements Router
         os.writeInt(sliceId);
         os.writeInt(fillSize);
         os.writeDouble(fillPrice);
+
+        // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
         os.flush();
     }
 
@@ -91,6 +104,8 @@ public class SampleRouter extends Thread implements Router
         os.writeInt(id);
         os.writeInt(sliceId);
         os.writeDouble(199 * RANDOM_NUM_GENERATOR.nextDouble());
+
+        // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
         os.flush();
     }
 }

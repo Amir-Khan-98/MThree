@@ -28,7 +28,7 @@ public class SampleClient extends Mock implements Client
     }
 
     @Override
-    public int sendOrder(Object par0) throws IOException
+    public int sendOrder() throws IOException
     {
         int size = RANDOM_NUM_GENERATOR.nextInt(5000);
         int instid = RANDOM_NUM_GENERATOR.nextInt(3);
@@ -144,7 +144,10 @@ public class SampleClient extends Mock implements Client
         }
         catch (IOException | ClassNotFoundException e)
         {
-            //  TODO Auto-generated catch block
+            if(e.getClass() == IOException.class)
+                System.out.println("IOException occurred, message: "+e.getMessage());
+            if(e.getClass() == ClassNotFoundException.class)
+                System.out.println("ClassNotFoundException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }
     }

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import Ref.Instrument;
 
+//Testing Braches and merging
+
 public class Order implements Serializable
 {
 
@@ -21,6 +23,16 @@ public class Order implements Serializable
 	private ArrayList<Order> slices;
 	private ArrayList<Fill> fills;
 	private char OrdStatus = 'A'; // OrdStatus is Fix 39, 'A' is 'Pending New'
+
+	public Order(long clientId, long clientOrderID, Instrument instrument, int size)
+	{
+		this.clientOrderID = clientOrderID;
+		this.size = size;
+		this.clientId = clientId;
+		this.instrument = instrument;
+		fills = new ArrayList<Fill>();
+		slices = new ArrayList<Order>();
+	}
 
 	public int sliceSizes()
 	{
@@ -182,17 +194,7 @@ public class Order implements Serializable
 		// state=cancelled
 	}
 
-	public Order(long clientId, long clientOrderID, Instrument instrument, int size)
-	{
-		this.clientOrderID = clientOrderID;
-		this.size = size;
-		this.clientId = clientId;
-		this.instrument = instrument;
-		fills = new ArrayList<Fill>();
-		slices = new ArrayList<Order>();
-	}
-
-	/* GETTER AND SETTERS */
+		/* GETTER AND SETTERS */
 
 	public long[] getBestPrices()
 	{
@@ -251,6 +253,8 @@ class Basket
 	Order[] orders;
 }
 
+// A Fill, is the action of completing an order for a security.
+// TODO (Chris added) do we need to incorporate the id? For what security the Fill is representing?
 class Fill implements Serializable
 {
 	long id;
