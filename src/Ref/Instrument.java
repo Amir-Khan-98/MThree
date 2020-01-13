@@ -17,6 +17,7 @@ public class Instrument implements Serializable{
 		return ric.ric;
 	}
 }
+
 class EqInstrument extends Instrument{
 	Date exDividend;
 

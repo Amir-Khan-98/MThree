@@ -104,6 +104,14 @@ public class Trader extends Thread implements TradeScreen
     {
         // TODO should update the trade screen
         Thread.sleep(2134);
-        sliceOrder(id, (int) orders.get(id).sizeRemaining() / 2);
+        if(orders.containsKey(id))
+        {
+            // TODO this is to prevent order.get returning null, but that might not be the actual problem.
+            sliceOrder(id, (int) orders.get(id).sizeRemaining() / 2);
+        }
+        else
+        {
+            System.out.println("Order with id: "+id+" doesnt exist in Trader: "+this.getName());
+        }
     }
 }
