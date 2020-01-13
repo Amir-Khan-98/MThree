@@ -8,6 +8,8 @@ import Ref.Instrument;
 // I think just make the class extend thread or implement runnable and then put setPrice logic in the run method.
 public class SampleLiveMarketData implements LiveMarketData
 {
+
+    //First Commit of the Branch
     private static final Random RANDOM_NUM_GENERATOR = new Random();
 
     public void setPrice(Order o)
