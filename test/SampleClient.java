@@ -135,7 +135,7 @@ public class SampleClient extends Mock implements Client
                                 if (OrdStatus == 'C') cancelled(orderId);
                                 else if (OrdStatus == 'P') partialFill(orderId);
                                 else if (OrdStatus == 'F') fullyFilled(orderId);
-                                //else if (OrdStatus == '0') sendOrder();
+                                else if (OrdStatus == '0') sendOrder();
                                 break;
                         }
                     }

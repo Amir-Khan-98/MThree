@@ -129,9 +129,9 @@ public class Trader extends Thread implements TradeScreen
     }
 
     @Override
-    public void price(int id, Order o) throws InterruptedException, IOException {
+    public void price(int orderId, Order o) throws InterruptedException, IOException {
 
-        System.out.println("THE ID IS: " + id + " OBJECT!!!!!!" + o.toString());
+        System.out.println("THE ID IS: " + orderId + " OBJECT!!!!!!" + o.toString());
         // TODO should update the trade screen
         // TradeScreen.api....
 
@@ -141,10 +141,10 @@ public class Trader extends Thread implements TradeScreen
         Thread.sleep(3000);
         if(orders.containsKey( (int) o.getOrderId())) {
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
-            sliceOrder(id, (int) orders.get( (int) o.getOrderId()).sizeRemaining() / 2);
+            sliceOrder(orderId, (int) orders.get( (int) o.getOrderId()).sizeRemaining() / 2);
         }
         else {
-            System.out.println("Order with id: "+id+" doesnt exist in Trader: "+this.getName());
+            System.out.println("Order with id: "+orderId+" doesnt exist in Trader: "+this.getName());
         }
     }
 }

@@ -25,7 +25,7 @@ public class OrderManager
     private static LiveMarketData liveMarketData;
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>(); // debugger will do this line as it gives state to the object
     // currently recording the number of new order messages we get. TODO why? use it for more?
-    private int id = 0; // debugger will do this line as it gives state to the object
+//    private int id = 0; // debugger will do this line as it gives state to the object
     private Socket[] orderRouters; // debugger will skip these lines as they dissapear at compile time into 'the object'/stack
     private Socket[] clients;
     private Socket trader;
@@ -199,7 +199,7 @@ public class OrderManager
         sendOrderToTrader((int) tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
-        id++;
+//        id++;
     }
 
     private void sendOrderToTrader(int orderId, Order o, Object method) throws IOException
@@ -226,7 +226,8 @@ public class OrderManager
         os.writeObject("11=" + o.getOrderId() + ";35=A;39=0");
         os.flush();
 
-        price(id, o);
+        // This was originally the global id in this class. (line 28)
+        price(orderId, o);
     }
 
     public void sliceOrder(int orderId, int sliceSize) throws IOException
@@ -255,11 +256,11 @@ public class OrderManager
         }
     }
 
-    private void internalCross(int id, Order o) throws IOException
+    private void internalCross(int orderId, Order o) throws IOException
     {
         for (Map.Entry<Integer, Order> entry : orders.entrySet())
         {
-            if (entry.getKey().intValue() == id)
+            if (entry.getKey().intValue() == orderId)
                 continue;
 
             Order matchingOrder = entry.getValue();
@@ -272,7 +273,7 @@ public class OrderManager
 
             if (sizeBefore != o.sizeRemaining())
             {
-                sendOrderToTrader(id, o, TradeScreen.api.cross);
+                sendOrderToTrader(orderId, o, TradeScreen.api.cross);
             }
         }
     }
@@ -282,31 +283,60 @@ public class OrderManager
 
     }
 
-    private void newFill(int id, int sliceId, int size, double price) throws IOException
+    private void newFill(int orderId, int sliceId, int size, double price) throws IOException
     {
 
-        System.out.println("THE INCOMING ID IS: " + id);
+        System.out.println("THE INCOMING ORDER ID IS: " + orderId);
 
         System.out.println("The Orders Array is!" +orders);
-        Order o = orders.get(id);
-        o.getSlices().get(sliceId).createFill(size, price);
-
-        if (o.sizeRemaining() == 0)
+        if(orders.containsKey(orderId))
         {
-            Database.write(o);
-        }
+            Order o = orders.get(orderId);
+            o.getSlices().get(sliceId).createFill(size, price);
 
-        sendOrderToTrader(id, o, TradeScreen.api.fill);
+            if (o.sizeRemaining() == 0)
+            {
+                Database.write(o);
+            }
+
+            sendOrderToTrader(orderId, o, TradeScreen.api.fill);
+        }
+        // If the order we are looking for is not there look for the order inside all the orders.
+        else
+            {
+            // For each order in orders
+            for (Order order: orders.values())
+            {
+                // for each order in each order.
+                for(Order innerOrder : order.getSlices())
+                {
+                    // If the inner order (the slice) is what we are looking for.
+                    if(innerOrder.getOrderId() == orderId)
+                    {
+                        System.out.println("Found the order inside another order!!!!!!!!!!!!!!!!!!!!!!!" + innerOrder.toString()+ " Sliceid: "+sliceId);
+                        order.getSlices().get(sliceId).createFill(size, price);
+
+                        if (innerOrder.sizeRemaining() == 0)
+                        {
+                            Database.write(innerOrder);
+                        }
+
+                        sendOrderToTrader(orderId, innerOrder, TradeScreen.api.fill);
+                    }
+
+                }
+            }
+        }
     }
 
-    private void routeOrderToRouter(int id, int sliceId, long size, Order order) throws IOException
+    private void routeOrderToRouter(int orderId, int sliceId, long size, Order order) throws IOException
     {
         for (Socket r : orderRouters)
         {
             //TODO JP Is rewritring the following:
             ObjectOutputStream os = new ObjectOutputStream(r.getOutputStream());
             os.writeObject(Router.api.priceAtSize);
-            os.writeInt(id);
+            os.writeInt(orderId);
             os.writeInt(sliceId);
             os.writeObject(order.instrument);
             os.writeLong(order.sizeRemaining());
@@ -355,9 +385,9 @@ public class OrderManager
         // order.orderRouter.writeObject(order);
     }
 
-    private void price(int id, Order o) throws IOException
+    private void price(int orderId, Order o) throws IOException
     {
         liveMarketData.setPrice(o);
-        sendOrderToTrader(id, o, TradeScreen.api.price);
+        sendOrderToTrader(orderId, o, TradeScreen.api.price);
     }
 }

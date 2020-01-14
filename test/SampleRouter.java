@@ -46,6 +46,8 @@ public class SampleRouter extends Thread implements Router
                     switch (methodName)
                     {
                         case routeOrder:
+//                            int[] readIntArray = new int[]{is.readInt(), is.readInt(), is.readInt()};
+//                            System.out.println("\n \n \n INTS: "+readIntArray[0]+readIntArray[0]+ "\n\n\n");
                             routeOrder(is.readInt(), is.readInt(), is.readInt(), (Instrument) is.readObject());
                             break;
                         case priceAtSize:
@@ -76,7 +78,7 @@ public class SampleRouter extends Thread implements Router
     /**
      * This class is used to communicate with the OrderManager
      * */
-    public void routeOrder(int id, int sliceId, int size, Instrument i) throws IOException, InterruptedException
+    public void routeOrder(int orderId, int sliceId, int size, Instrument i) throws IOException, InterruptedException
     {
         // MockI.show(""+order);
         int fillSize = RANDOM_NUM_GENERATOR.nextInt(size);
@@ -90,7 +92,7 @@ public class SampleRouter extends Thread implements Router
         //Write and flush
         os = new ObjectOutputStream(omConn.getOutputStream());
         os.writeObject("newFill");
-        os.writeInt(id);
+        os.writeInt(orderId);
         os.writeInt(sliceId);
         os.writeInt(fillSize);
         os.writeDouble(fillPrice);
