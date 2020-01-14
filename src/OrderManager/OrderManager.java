@@ -338,7 +338,7 @@ public class OrderManager
             os.writeObject(Router.api.priceAtSize);
             os.writeInt(orderId);
             os.writeInt(sliceId);
-            os.writeObject(order.instrument);
+            os.writeObject(order.getInstrument());
             os.writeLong(order.sizeRemaining());
             os.flush();
         }
@@ -375,7 +375,7 @@ public class OrderManager
         os.writeInt(o.getOrderId());
         os.writeInt(sliceId);
         os.writeInt(o.sizeRemaining());
-        os.writeObject(o.instrument);
+        os.writeObject(o.getInstrument());
         os.flush();
     }
 
