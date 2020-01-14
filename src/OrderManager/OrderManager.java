@@ -219,6 +219,7 @@ public class OrderManager
             return;
         }
 
+        //TODO JP Is rewritring the following:
         int sliceId = o.newSlice(sliceSize);
         Order slice = o.getSlices().get(sliceId);
         internalCross(orderId, slice);
@@ -274,6 +275,7 @@ public class OrderManager
     {
         for (Socket r : orderRouters)
         {
+            //TODO JP Is rewritring the following:
             ObjectOutputStream os = new ObjectOutputStream(r.getOutputStream());
             os.writeObject(Router.api.priceAtSize);
             os.writeInt(id);
@@ -309,6 +311,7 @@ public class OrderManager
             }
         }
 
+        //TODO JP Is rewritring the following:
         ObjectOutputStream os = new ObjectOutputStream(orderRouters[minIndex].getOutputStream());
         os.writeObject(Router.api.routeOrder);
         os.writeLong(o.getOrderId());
