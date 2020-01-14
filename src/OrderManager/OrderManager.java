@@ -3,6 +3,7 @@ package OrderManager;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
 import TradeScreen.TradeScreen;
 
-public class OrderManager
+public class OrderManager implements Serializable
 {
     private static LiveMarketData liveMarketData;
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>(); // debugger will do this line as it gives state to the object
@@ -162,6 +163,7 @@ public class OrderManager
     private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException
     {
         orders.put(id, new Order(clientId, clientOrderId, nos.instrument, nos.size));
+        System.out.println("Order in newOrder OrderManager" + orders.get(id));
         // send a message to the client with 39=A; // OrdStatus is Fix 39, 'A' is 'Pending New'
         ObjectOutputStream os = new ObjectOutputStream(clients[clientId].getOutputStream());
         // newOrderSingle acknowledgement
@@ -309,7 +311,7 @@ public class OrderManager
 
     private void sendCancel(Order order, Router orderRouter)
     {
-        // orderRouter.sendCancel(order);
+         //orderRouter.sendCancel(order);
         // order.orderRouter.writeObject(order);
     }
 

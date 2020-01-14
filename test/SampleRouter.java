@@ -83,7 +83,15 @@ public class SampleRouter extends Thread implements Router
 
         // TODO have this similar to the market price of the instrument
         // Instead of fillPrice being 199 * 0-1, make it similar to the actual price of the instrument passed into the method? (I assume)
-        double fillPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
+        double x = RANDOM_NUM_GENERATOR.nextDouble();
+        double fillPrice;
+        if (x>0 && x<0.5){
+             fillPrice = i.getInitialMarketPrice()+ 0.1*i.getInitialMarketPrice()*RANDOM_NUM_GENERATOR.nextDouble();
+        }
+        else{
+             fillPrice = i.getInitialMarketPrice()- 0.1*i.getInitialMarketPrice()*RANDOM_NUM_GENERATOR.nextDouble();
+        }
+
         Thread.sleep(42);
 
 

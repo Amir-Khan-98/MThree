@@ -2,6 +2,7 @@ package Ref;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Random;
 
 public class Instrument implements Serializable{
 	long id;
@@ -10,12 +11,23 @@ public class Instrument implements Serializable{
 	String isin;
 	String sedol;
 	String bbid;
+
+	public double getInitialMarketPrice() {
+		return initialMarketPrice;
+	}
+
+	double initialMarketPrice;
+	private static final Random RANDOM_NUM_GENERATOR = new Random();
 	public Instrument(Ric ric){
 		this.ric=ric;
+		this.initialMarketPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
+
 	}
 	public String toString(){
 		return ric.ric;
 	}
+
+
 }
 // shares
 class EqInstrument extends Instrument{
