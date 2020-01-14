@@ -91,7 +91,6 @@ public class Trader extends Thread implements TradeScreen
     {
         // TODO the order should go in a visual grid, but not needed for test purposes
         Thread.sleep(2134);
-
         // Put the order sent in the method with its ID into the map of orders.
         orders.put(id, order);
         acceptOrder(id);
