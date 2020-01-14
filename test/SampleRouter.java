@@ -6,7 +6,6 @@ import java.util.Random;
 
 import javax.net.ServerSocketFactory;
 
-import OrderManager.Order;
 import OrderRouter.Router;
 import Ref.Instrument;
 import Ref.Ric;
@@ -87,11 +86,11 @@ public class SampleRouter extends Thread implements Router
 
         double fillPrice;
         if (x>0 && x<0.5){//50% chance of adding or subtracting form initial market price
-             fillPrice = i.getInitialMarketPrice()+ 0.1*i.getInitialMarketPrice()*RANDOM_NUM_GENERATOR.nextDouble(); // adds 0-10% to the initial price to make fill price
+             fillPrice = i.getUnitPrice()+ 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble(); // adds 0-10% to the initial price to make fill price
             fillPrice = Math.round(fillPrice*100.0)/100.0;
         }
         else{
-             fillPrice = i.getInitialMarketPrice()- 0.1*i.getInitialMarketPrice()*RANDOM_NUM_GENERATOR.nextDouble();// subs 0-10% to the initial price to make fill price
+             fillPrice = i.getUnitPrice()- 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble();// subs 0-10% to the initial price to make fill price
             fillPrice = Math.round(fillPrice*100.0)/100.0;
         }
 

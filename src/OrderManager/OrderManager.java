@@ -263,7 +263,7 @@ public class OrderManager
                 continue;
 
             Order matchingOrder = entry.getValue();
-            if (!(matchingOrder.getInstrument().equals(o.getInstrument()) && matchingOrder.initialMarketPrice == o.initialMarketPrice))
+            if (!(matchingOrder.getInstrument().equals(o.getInstrument()) && matchingOrder.unitPrice == o.unitPrice))
                 continue;
 
             // TODO add support here and in Order for limit orders

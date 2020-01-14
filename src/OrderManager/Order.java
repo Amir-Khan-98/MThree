@@ -20,7 +20,7 @@ public class Order implements Serializable
 
 	private long clientId;
 	private Instrument instrument;
-	public double initialMarketPrice;
+	public double unitPrice;
 	private ArrayList<Order> slices;
 
 	@Override
@@ -34,7 +34,7 @@ public class Order implements Serializable
 				", bestPriceCount=" + bestPriceCount +
 				", clientId=" + clientId +
 				", instrument=" + instrument +
-				", initialMarketPrice=" +instrument.getInitialMarketPrice() +
+				", unitPrice=" +instrument.getUnitPrice() +
 				", slices=" + slices +
 				", fills=" + fills +
 				", OrdStatus=" + OrdStatus +
@@ -51,7 +51,7 @@ public class Order implements Serializable
 		this.size = size;
 		this.clientId = clientId;
 		this.instrument = instrument;
-		this.initialMarketPrice = instrument.getInitialMarketPrice(); // set the orders initial market price to the price of instrument
+		this.unitPrice = instrument.getUnitPrice(); // set the orders initial market price to the price of instrument
 		fills = new ArrayList<Fill>();
 		slices = new ArrayList<Order>();
 
@@ -140,14 +140,14 @@ public class Order implements Serializable
 
 				if(sze <= msze)
 				{
-					 slice.createFill(sze,matchingOrder.initialMarketPrice);//Amir has changed initialMarketPrice to matchingOrder.initialMarketPrice
-					 matchingSlice.createFill(sze, matchingOrder.initialMarketPrice);
+					 slice.createFill(sze,matchingOrder.unitPrice);//Amir has changed unitPrice to matchingOrder.unitPrice
+					 matchingSlice.createFill(sze, matchingOrder.unitPrice);
 					 break;
 				}
 				// sze>msze
 
-				slice.createFill(msze,matchingOrder.initialMarketPrice);
-				matchingSlice.createFill(msze, matchingOrder.initialMarketPrice);
+				slice.createFill(msze,matchingOrder.unitPrice);
+				matchingSlice.createFill(msze, matchingOrder.unitPrice);
 			}
 
 			long sze = slice.sizeRemaining();
@@ -156,13 +156,13 @@ public class Order implements Serializable
 			{
 				if(sze >= mParent)
 				{
-					slice.createFill(sze, matchingOrder.initialMarketPrice);
-					matchingOrder.createFill(sze, matchingOrder.initialMarketPrice);
+					slice.createFill(sze, matchingOrder.unitPrice);
+					matchingOrder.createFill(sze, matchingOrder.unitPrice);
 				}
 				else
 				{
-					slice.createFill(mParent, matchingOrder.initialMarketPrice);
-					matchingOrder.createFill(mParent, matchingOrder.initialMarketPrice);
+					slice.createFill(mParent, matchingOrder.unitPrice);
+					matchingOrder.createFill(mParent, matchingOrder.unitPrice);
 				}
 			}
 
@@ -184,14 +184,14 @@ public class Order implements Serializable
 
 				if(sze <= msze)
 				{
-					 createFill(sze, matchingOrder.initialMarketPrice);
-					 matchingSlice.createFill(sze, matchingOrder.initialMarketPrice);
+					 createFill(sze, matchingOrder.unitPrice);
+					 matchingSlice.createFill(sze, matchingOrder.unitPrice);
 					 break;
 				}
 				// sze>msze
 
-				createFill(msze,matchingOrder.initialMarketPrice);
-				matchingSlice.createFill(msze, matchingOrder.initialMarketPrice);
+				createFill(msze,matchingOrder.unitPrice);
+				matchingSlice.createFill(msze, matchingOrder.unitPrice);
 			}
 
 			long sze = sizeRemaining();
@@ -201,13 +201,13 @@ public class Order implements Serializable
 			{
 				if(sze >= mParent)
 				{
-					createFill(sze, matchingOrder.initialMarketPrice);
-					matchingOrder.createFill(sze, matchingOrder.initialMarketPrice);
+					createFill(sze, matchingOrder.unitPrice);
+					matchingOrder.createFill(sze, matchingOrder.unitPrice);
 				}
 				else
 				{
-					createFill(mParent, matchingOrder.initialMarketPrice);
-					matchingOrder.createFill(mParent, matchingOrder.initialMarketPrice);
+					createFill(mParent, matchingOrder.unitPrice);
+					matchingOrder.createFill(mParent, matchingOrder.unitPrice);
 				}
 			}
 		}
