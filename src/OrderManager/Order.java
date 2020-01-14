@@ -26,6 +26,7 @@ public class Order implements Serializable
 
 	public Order(long clientId, long clientOrderID, Instrument instrument, int size)
 	{
+		this.orderId = OrderIDTracker.getInstance().getNewID();
 		this.clientOrderID = clientOrderID;
 		this.size = size;
 		this.clientId = clientId;

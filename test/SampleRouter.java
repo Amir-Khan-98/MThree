@@ -99,10 +99,7 @@ public class SampleRouter extends Thread implements Router
         os.flush();
     }
 
-    @Override
-    public void sendCancel(int id, int sliceId, int size, Instrument i)
-    { // MockI.show(""+order);
-    }
+
 
     @Override
     public void priceAtSize(int id, int sliceId, Instrument i, int size) throws IOException
@@ -115,5 +112,10 @@ public class SampleRouter extends Thread implements Router
 
         // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
         os.flush();
+    }
+
+    @Override
+    public void sendCancel(int id, int sliceId, int size, Instrument i)
+    { // MockI.show(""+order);
     }
 }

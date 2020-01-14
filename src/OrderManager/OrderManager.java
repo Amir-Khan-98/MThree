@@ -31,13 +31,11 @@ public class OrderManager
 
         while (!connected && tryCounter < 600)
         {
-            try
-            {
+            try {
                 Socket s = new Socket(location.getHostName(), location.getPort());
                 s.setKeepAlive(true);
                 return s;
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 Thread.sleep(1000);
                 tryCounter++;
             }
@@ -88,6 +86,10 @@ public class OrderManager
 
             // TODO this is pretty cpu intensive, use a more modern polling/interrupt/select approach
             // we want to use the arrayindex as the clientId, so use traditional for loop instead of foreach
+
+
+
+            //CLIENTS
             for (clientId = 0; clientId < this.clients.length; clientId++)
             { // check if we have data on any of the sockets
 
@@ -112,6 +114,8 @@ public class OrderManager
                 }
             }
 
+
+            //ROUTERS
             for (routerId = 0; routerId < this.orderRouters.length; routerId++)
             { // check if we have data on any of the sockets
 
@@ -141,6 +145,8 @@ public class OrderManager
                 }
             }
 
+
+            //Trader
             if (0 < this.trader.getInputStream().available())
             {
                 ObjectInputStream is = new ObjectInputStream(this.trader.getInputStream());
@@ -282,6 +288,11 @@ public class OrderManager
         order.setBestPriceCount(0L); //  L = long to compiler
     }
 
+
+    /**
+     * Use in best price.
+     * Why I have no idea
+     * */
     private void reallyRouteOrder(int sliceId, Order o) throws IOException
     {
         // TODO this assumes we are buying rather than selling

@@ -54,3 +54,5 @@
 /out/production/MThreeGroupProject/SampleRouter.class
 /out/production/MThreeGroupProject/Trader$1.class
 /out/production/MThreeGroupProject/Trader.class
+*.class
+/.idea/uiDesigner.xml
