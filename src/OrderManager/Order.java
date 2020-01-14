@@ -34,7 +34,7 @@ public class Order implements Serializable
 				", bestPriceCount=" + bestPriceCount +
 				", clientId=" + clientId +
 				", instrument=" + instrument +
-				", initialMarketPrice=" + initialMarketPrice +
+				", initialMarketPrice=" +instrument.getInitialMarketPrice() +
 				", slices=" + slices +
 				", fills=" + fills +
 				", OrdStatus=" + OrdStatus +
