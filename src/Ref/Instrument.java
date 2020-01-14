@@ -11,12 +11,12 @@ public class Instrument implements Serializable{
 	String isin;
 	String sedol;
 	String bbid;
-
+	private double initialMarketPrice;
 	public double getInitialMarketPrice() {
 		return initialMarketPrice;
 	}
 
-	double initialMarketPrice;
+
 	private static final Random RANDOM_NUM_GENERATOR = new Random();
 	public Instrument(Ric ric){
 		this.ric=ric;

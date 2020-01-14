@@ -51,6 +51,7 @@ public class Order implements Serializable
 		this.size = size;
 		this.clientId = clientId;
 		this.instrument = instrument;
+		this.initialMarketPrice = instrument.getInitialMarketPrice();
 		fills = new ArrayList<Fill>();
 		slices = new ArrayList<Order>();
 
@@ -139,8 +140,8 @@ public class Order implements Serializable
 
 				if(sze <= msze)
 				{
-					 slice.createFill(sze,initialMarketPrice);
-					 matchingSlice.createFill(sze, initialMarketPrice);
+					 slice.createFill(sze,matchingOrder.initialMarketPrice);
+					 matchingSlice.createFill(sze, matchingOrder.initialMarketPrice);
 					 break;
 				}
 				// sze>msze
