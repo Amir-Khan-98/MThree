@@ -284,6 +284,10 @@ public class OrderManager
 
     private void newFill(int id, int sliceId, int size, double price) throws IOException
     {
+
+        System.out.println("THE INCOMING ID IS: " + id);
+
+        System.out.println("The Orders Array is!" +orders);
         Order o = orders.get(id);
         o.getSlices().get(sliceId).createFill(size, price);
 
@@ -304,7 +308,7 @@ public class OrderManager
             os.writeObject(Router.api.priceAtSize);
             os.writeInt(id);
             os.writeInt(sliceId);
-            os.writeObject(order.getInstrument());
+            os.writeObject(order.instrument);
             os.writeLong(order.sizeRemaining());
             os.flush();
         }
@@ -338,10 +342,10 @@ public class OrderManager
         //TODO JP Is rewritring the following:
         ObjectOutputStream os = new ObjectOutputStream(orderRouters[minIndex].getOutputStream());
         os.writeObject(Router.api.routeOrder);
-        os.writeLong(o.getOrderId());
+        os.writeInt(o.getOrderId());
         os.writeInt(sliceId);
-        os.writeLong(o.sizeRemaining());
-        os.writeObject(o.getInstrument());
+        os.writeInt(o.sizeRemaining());
+        os.writeObject(o.instrument);
         os.flush();
     }
 

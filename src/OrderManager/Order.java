@@ -11,15 +11,15 @@ import Ref.Instrument;
 public class Order implements Serializable
 {
 
-	private long orderId;
+	private int orderId;
 	public long orderRouter;
 	private long clientOrderID;
-	private long size;
+	private int size;
 	private long[] bestPrices;
 	private long bestPriceCount;
 
 	private long clientId;
-	private Instrument instrument;
+	public Instrument instrument;
 	public double initialMarketPrice;
 	private ArrayList<Order> slices;
 
@@ -42,7 +42,7 @@ public class Order implements Serializable
 	}
 
 	private ArrayList<Fill> fills;
-	private char OrdStatus = 'A'; // OrdStatus is Fix 39, 'A' is 'Pending New'
+	private char OrdStatus = 'A'; //TODO OrdStatus is Fix 39, 'A' is 'Pending New'
 
 	public Order(long clientId, long clientOrderID, Instrument instrument, int size)
 	{
@@ -90,7 +90,7 @@ public class Order implements Serializable
 		return filledSoFar;
 	}
 
-	public long sizeRemaining()
+	public int sizeRemaining()
 	{
 		return size - sizeFilled();
 	}
@@ -254,7 +254,7 @@ public class Order implements Serializable
 		OrdStatus = ordStatus;
 	}
 
-	public long getOrderId()
+	public int getOrderId()
 	{
 		return orderId;
 	}

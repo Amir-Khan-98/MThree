@@ -3,13 +3,13 @@ package OrderManager;
 public class OrderIDTracker {
 
     private volatile static OrderIDTracker orderIDTracker;
-    private long counter = 0;
+    private int counter = 0;
 
     private OrderIDTracker(){
 
     }
 
-    public synchronized long getNewID(){
+    public synchronized int getNewID(){
         return counter++;
     }
 
