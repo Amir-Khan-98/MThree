@@ -87,8 +87,14 @@ public class OrderManager
         int clientId, routerId;
         Socket client, router;
 
+        int count = 0;
         // main loop, wait for a message, then process it
         while (true) {
+
+            System.out.println("WHILE COUNTER " + count);
+            count++;
+
+            Thread.sleep(2000);
 
             // TODO this is pretty cpu intensive, use a more modern polling/interrupt/select approach
             // we want to use the arrayindex as the clientId, so use traditional for loop instead of foreach
@@ -105,6 +111,8 @@ public class OrderManager
                     ObjectInputStream is = new ObjectInputStream(client.getInputStream()); // create an object inputstream, this is a pretty stupid way of doing it, why not create it once rather than every time around the loop
                     String method = (String) is.readObject();
                     System.out.println(Thread.currentThread().getName() + " calling " + method);
+
+                    System.out.println("\nPrint this:" + method);
 
                     switch (method)
                     { // determine the type of message and process it
@@ -135,6 +143,8 @@ public class OrderManager
                     switch (method)
                     { // determine the type of message and process it
                         case "bestPrice":
+
+                            System.out.println("We are int the best price");
                             int OrderId = is.readInt();
                             int SliceId = is.readInt();
                             Order slice = orders.get(OrderId).getSlices().get(SliceId);
@@ -171,9 +181,12 @@ public class OrderManager
         }
     }
 
-    private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException
-    {
-        orders.put(id, new Order(clientId, clientOrderId, nos.instrument, nos.size));
+    private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException {
+
+        System.out.println("I AM A NORMAL ORDER\n");
+
+        Order tempOrder = new Order(clientId, clientOrderId, nos.instrument, nos.size);
+        orders.put((int) tempOrder.getOrderId(), tempOrder);
         // send a message to the client with 39=A; // OrdStatus is Fix 39, 'A' is 'Pending New'
         ObjectOutputStream os = new ObjectOutputStream(clients[clientId].getOutputStream());
         // newOrderSingle acknowledgement
@@ -181,7 +194,9 @@ public class OrderManager
         os.writeObject("11=" + clientOrderId + ";35=A;39=A;");
         os.flush();
 
-        sendOrderToTrader(id, orders.get(id), TradeScreen.api.newOrder);
+        System.out.println("\n" + orders + "\n");
+
+        sendOrderToTrader((int) tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
         id++;
@@ -216,6 +231,9 @@ public class OrderManager
 
     public void sliceOrder(int orderId, int sliceSize) throws IOException
     {
+
+        System.out.println("I AM A SLICE ORDER\n");
+
         Order o = orders.get(orderId);
         // slice the order. We have to check this is a valid size.
         // Order has a list of slices, and a list of fills, each slice is a childorder and each fill is associated with either a child order or the original order
