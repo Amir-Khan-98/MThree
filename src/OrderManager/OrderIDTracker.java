@@ -2,7 +2,7 @@ package OrderManager;
 
 public class OrderIDTracker {
 
-    private static OrderIDTracker orderIDTracker;
+    private volatile static OrderIDTracker orderIDTracker;
     private long counter = 0;
 
     private OrderIDTracker(){

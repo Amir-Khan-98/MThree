@@ -40,7 +40,7 @@ public class SampleRouter extends Thread implements Router
                 {
                     is = new ObjectInputStream(omConn.getInputStream());
 
-                    // Router.api is just a placeholder for what method should be called.
+                    // Router. is just a placeholder for what method should be called.
                     Router.api methodName = (Router.api) is.readObject();
                     System.out.println("Order Router recieved method call for:" + methodName);
                     switch (methodName)
@@ -107,10 +107,7 @@ public class SampleRouter extends Thread implements Router
         os.flush();
     }
 
-    @Override
-    public void sendCancel(int id, int sliceId, int size, Instrument i)
-    { // MockI.show(""+order);
-    }
+
 
     @Override
     public void priceAtSize(int id, int sliceId, Instrument i, int size) throws IOException
@@ -123,5 +120,10 @@ public class SampleRouter extends Thread implements Router
 
         // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
         os.flush();
+    }
+
+    @Override
+    public void sendCancel(int id, int sliceId, int size, Instrument i)
+    { // MockI.show(""+order);
     }
 }

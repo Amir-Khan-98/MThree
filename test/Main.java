@@ -51,29 +51,49 @@ class MockClient extends Thread
 
     public void run()
     {
-        try
-        {
-            SampleClient client = new SampleClient(port);
-            if (port == 2000)
-            {
-                // done "why does this take an arg?"
-                client.sendOrder();
-                int id = client.sendOrder();
-                // TODO client.sendCancel(id);
-                client.messageHandler();
-            }
-            else
-            {
-                client.sendOrder();
-                client.messageHandler();
-            }
-        }
-        catch (IOException e)
-        {
-            System.out.println("IOException Occured. Message: "+e.getMessage());
+
+        SampleClient client = null;
+        try {
+            client = new SampleClient(port);
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
+        while(true) {
+            try {
+
+
+                System.out.println("RUNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+                if (port == 2000) {
+                    // done "why does this take an arg?"
+                    client.sendOrder();
+                    int id = client.sendOrder();
+                    // TODO client.sendCancel(id);
+                    client.messageHandler();
+                } else {
+                    client.sendOrder();
+                    client.messageHandler();
+
+                    System.out.println("TESTESTESTESTESTESTESTEST");
+
+                    //**
+                    // Code Ever Gets here
+                    //
+                    // */
+                }
+
+                System.out.println("TESTESTESTESTESTESTESTEST");
+            } catch (IOException e) {
+                System.out.println("IOException Occured. Message: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 

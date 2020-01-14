@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import OrderClient.Client;
 import OrderClient.NewOrderSingle;
@@ -17,7 +18,7 @@ public class SampleClient extends Mock implements Client
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
     private static final HashMap OUT_QUEUE = new HashMap(); // queue for outgoing orders
-    private int id = 0; // message id number
+    private volatile AtomicInteger messageId = new AtomicInteger( 0); // message id number
     private Socket omConn; // connection to order manager
 
     public SampleClient(int port) throws IOException
@@ -28,26 +29,26 @@ public class SampleClient extends Mock implements Client
     }
 
     @Override
-    public int sendOrder() throws IOException
+    public synchronized int sendOrder() throws IOException
     {
         int size = RANDOM_NUM_GENERATOR.nextInt(5000);
         int instid = RANDOM_NUM_GENERATOR.nextInt(3);
         Instrument instrument = INSTRUMENTS[RANDOM_NUM_GENERATOR.nextInt(INSTRUMENTS.length)];
         NewOrderSingle nos = new NewOrderSingle(size, instid, instrument);
 
-        show("sendOrder: id=" + id + " size=" + size + " instrument=" + INSTRUMENTS[instid].toString());
-        OUT_QUEUE.put(id, nos);
+        show("sendOrder: messageId=" + messageId + " size=" + size + " instrument=" + INSTRUMENTS[instid].toString());
+        OUT_QUEUE.put(messageId, nos);
 
         if (omConn.isConnected())
         {
             ObjectOutputStream os = new ObjectOutputStream(omConn.getOutputStream());
             os.writeObject("newOrderSingle");
-            // os.writeObject("35=D;");
-            os.writeInt(id);
+            //os.writeObject("35=D;");
+            os.writeInt(messageId.get());
             os.writeObject(nos);
             os.flush();
         }
-        return id++;
+        return messageId.incrementAndGet();
     }
 
     @Override
@@ -62,23 +63,25 @@ public class SampleClient extends Mock implements Client
     }
 
     @Override
-    public void partialFill(Order order)
+    public void partialFill(int orderId)
     {
-        show("" + order);
+        show("" + OUT_QUEUE.get(orderId));
+        OUT_QUEUE.remove(orderId);
     }
 
     @Override
-    public void fullyFilled(Order order)
-    {
-        show("" + order);
-        OUT_QUEUE.remove(order.getOrderId());
+    public void fullyFilled(int orderId) {
+
+        //TODO fectch Orders here
+        show("" + OUT_QUEUE.get(orderId));
+        OUT_QUEUE.remove(orderId);
     }
 
     @Override
-    public void cancelled(Order order)
+    public void cancelled(int orderId)
     {
-        show("" + order);
-        OUT_QUEUE.remove(order.getOrderId());
+        show("" + OUT_QUEUE.get(orderId));
+        OUT_QUEUE.remove(orderId);
     }
 
     enum methods
@@ -102,7 +105,7 @@ public class SampleClient extends Mock implements Client
                     String fix = (String) is.readObject();
                     System.out.println(Thread.currentThread().getName() + " received fix message: " + fix);
                     String[] fixTags = fix.split(";");
-                    int OrderId = -1;
+                    int orderId = -1;
                     char MsgType;
                     int OrdStatus;
                     methods whatToDo = methods.dontKnow;
@@ -111,10 +114,14 @@ public class SampleClient extends Mock implements Client
                     for (int i = 0; i < fixTags.length; i++)
                     {
                         String[] tag_value = fixTags[i].split("=");
+
+                        System.out.println(tag_value.toString());
+
+
                         switch (tag_value[0])
                         {
                             case "11":
-                                OrderId = Integer.parseInt(tag_value[1]);
+                                orderId = Integer.parseInt(tag_value[1]);
                                 break;
                             case "35":
                                 MsgType = tag_value[1].charAt(0);
@@ -122,24 +129,31 @@ public class SampleClient extends Mock implements Client
                                 break;
                             case "39":
                                 OrdStatus = tag_value[1].charAt(0);
+
+                                System.out.println(OrdStatus);
+
+                                if (OrdStatus == 'C') cancelled(orderId);
+                                else if (OrdStatus == 'P') partialFill(orderId);
+                                else if (OrdStatus == 'F') fullyFilled(orderId);
+                                else if (OrdStatus == '0') sendOrder();
                                 break;
                         }
                     }
                     switch (whatToDo)
                     {
                         case newOrderSingleAcknowledgement:
-                            newOrderSingleAcknowledgement(OrderId);
+                            newOrderSingleAcknowledgement(orderId);
                     }
 					
-					/*message=connection.getMessage();
-					char type;
-					switch(type){
-						case 'C':cancelled(message);break;
-						case 'P':partialFill(message);break;
-						case 'F':fullyFilled(message);
-					}*/
+//					message=connection.getMessage();
+//					char type;
+//					switch(type){
+//
+//					}
                     show("");
                 }
+
+
             }
         }
         catch (IOException | ClassNotFoundException e)

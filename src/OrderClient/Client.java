@@ -11,9 +11,9 @@ public interface Client
 	void sendCancel(int id);
 	
 	//  Incoming messages
-	void partialFill(Order order);
-	void fullyFilled(Order order);
-	void cancelled(Order order);
+	void partialFill(int orderId);
+	void fullyFilled(int orderId);
+	void cancelled(int orderId);
 	
 	void messageHandler();
 }

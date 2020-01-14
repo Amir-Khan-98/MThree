@@ -3,7 +3,6 @@ package OrderManager;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
@@ -15,7 +14,13 @@ import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
 import TradeScreen.TradeScreen;
 
-public class OrderManager implements Serializable
+/**
+ * Changes to this class to do with the merge
+ *
+ */
+
+
+public class OrderManager
 {
     private static LiveMarketData liveMarketData;
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>(); // debugger will do this line as it gives state to the object
@@ -32,13 +37,11 @@ public class OrderManager implements Serializable
 
         while (!connected && tryCounter < 600)
         {
-            try
-            {
+            try {
                 Socket s = new Socket(location.getHostName(), location.getPort());
                 s.setKeepAlive(true);
                 return s;
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 Thread.sleep(1000);
                 tryCounter++;
             }
@@ -84,11 +87,21 @@ public class OrderManager implements Serializable
         int clientId, routerId;
         Socket client, router;
 
+        int count = 0;
         // main loop, wait for a message, then process it
         while (true) {
 
+            System.out.println("WHILE COUNTER " + count);
+            count++;
+
+            Thread.sleep(2000);
+
             // TODO this is pretty cpu intensive, use a more modern polling/interrupt/select approach
             // we want to use the arrayindex as the clientId, so use traditional for loop instead of foreach
+
+
+
+            //CLIENTS
             for (clientId = 0; clientId < this.clients.length; clientId++)
             { // check if we have data on any of the sockets
 
@@ -98,6 +111,8 @@ public class OrderManager implements Serializable
                     ObjectInputStream is = new ObjectInputStream(client.getInputStream()); // create an object inputstream, this is a pretty stupid way of doing it, why not create it once rather than every time around the loop
                     String method = (String) is.readObject();
                     System.out.println(Thread.currentThread().getName() + " calling " + method);
+
+                    System.out.println("\nPrint this:" + method);
 
                     switch (method)
                     { // determine the type of message and process it
@@ -113,6 +128,8 @@ public class OrderManager implements Serializable
                 }
             }
 
+
+            //ROUTERS
             for (routerId = 0; routerId < this.orderRouters.length; routerId++)
             { // check if we have data on any of the sockets
 
@@ -126,6 +143,8 @@ public class OrderManager implements Serializable
                     switch (method)
                     { // determine the type of message and process it
                         case "bestPrice":
+
+                            System.out.println("We are int the best price");
                             int OrderId = is.readInt();
                             int SliceId = is.readInt();
                             Order slice = orders.get(OrderId).getSlices().get(SliceId);
@@ -142,6 +161,8 @@ public class OrderManager implements Serializable
                 }
             }
 
+
+            //Trader
             if (0 < this.trader.getInputStream().available())
             {
                 ObjectInputStream is = new ObjectInputStream(this.trader.getInputStream());
@@ -160,10 +181,12 @@ public class OrderManager implements Serializable
         }
     }
 
-    private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException
-    {
-        orders.put(id, new Order(clientId, clientOrderId, nos.instrument, nos.size));
-        System.out.println("Order in newOrder OrderManager" + orders.get(id));
+    private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException {
+
+        System.out.println("I AM A NORMAL ORDER\n");
+
+        Order tempOrder = new Order(clientId, clientOrderId, nos.instrument, nos.size);
+        orders.put((int) tempOrder.getOrderId(), tempOrder);
         // send a message to the client with 39=A; // OrdStatus is Fix 39, 'A' is 'Pending New'
         ObjectOutputStream os = new ObjectOutputStream(clients[clientId].getOutputStream());
         // newOrderSingle acknowledgement
@@ -171,7 +194,9 @@ public class OrderManager implements Serializable
         os.writeObject("11=" + clientOrderId + ";35=A;39=A;");
         os.flush();
 
-        sendOrderToTrader(id, orders.get(id), TradeScreen.api.newOrder);
+        System.out.println("\n" + orders + "\n");
+
+        sendOrderToTrader((int) tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
         id++;
@@ -206,6 +231,9 @@ public class OrderManager implements Serializable
 
     public void sliceOrder(int orderId, int sliceSize) throws IOException
     {
+
+        System.out.println("I AM A SLICE ORDER\n");
+
         Order o = orders.get(orderId);
         // slice the order. We have to check this is a valid size.
         // Order has a list of slices, and a list of fills, each slice is a childorder and each fill is associated with either a child order or the original order
@@ -215,6 +243,7 @@ public class OrderManager implements Serializable
             return;
         }
 
+        //TODO JP Is rewritring the following:
         int sliceId = o.newSlice(sliceSize);
         Order slice = o.getSlices().get(sliceId);
         internalCross(orderId, slice);
@@ -270,6 +299,7 @@ public class OrderManager implements Serializable
     {
         for (Socket r : orderRouters)
         {
+            //TODO JP Is rewritring the following:
             ObjectOutputStream os = new ObjectOutputStream(r.getOutputStream());
             os.writeObject(Router.api.priceAtSize);
             os.writeInt(id);
@@ -284,6 +314,11 @@ public class OrderManager implements Serializable
         order.setBestPriceCount(0L); //  L = long to compiler
     }
 
+
+    /**
+     * Use in best price.
+     * Why I have no idea
+     * */
     private void reallyRouteOrder(int sliceId, Order o) throws IOException
     {
         // TODO this assumes we are buying rather than selling
@@ -300,6 +335,7 @@ public class OrderManager implements Serializable
             }
         }
 
+        //TODO JP Is rewritring the following:
         ObjectOutputStream os = new ObjectOutputStream(orderRouters[minIndex].getOutputStream());
         os.writeObject(Router.api.routeOrder);
         os.writeLong(o.getOrderId());
@@ -311,7 +347,7 @@ public class OrderManager implements Serializable
 
     private void sendCancel(Order order, Router orderRouter)
     {
-         //orderRouter.sendCancel(order);
+        // orderRouter.sendCancel(order);
         // order.orderRouter.writeObject(order);
     }
 

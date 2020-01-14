@@ -2,6 +2,7 @@ package OrderManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import Ref.Instrument;
 
@@ -21,17 +22,39 @@ public class Order implements Serializable
 	private Instrument instrument;
 	public double initialMarketPrice;
 	private ArrayList<Order> slices;
+
+	@Override
+	public String toString() {
+		return "Order{" +
+				"orderId=" + orderId +
+				", orderRouter=" + orderRouter +
+				", clientOrderID=" + clientOrderID +
+				", size=" + size +
+				", bestPrices=" + Arrays.toString(bestPrices) +
+				", bestPriceCount=" + bestPriceCount +
+				", clientId=" + clientId +
+				", instrument=" + instrument +
+				", initialMarketPrice=" + initialMarketPrice +
+				", slices=" + slices +
+				", fills=" + fills +
+				", OrdStatus=" + OrdStatus +
+				'}';
+	}
+
 	private ArrayList<Fill> fills;
 	private char OrdStatus = 'A'; // OrdStatus is Fix 39, 'A' is 'Pending New'
 
 	public Order(long clientId, long clientOrderID, Instrument instrument, int size)
 	{
+		this.orderId = OrderIDTracker.getInstance().getNewID();
 		this.clientOrderID = clientOrderID;
 		this.size = size;
 		this.clientId = clientId;
 		this.instrument = instrument;
 		fills = new ArrayList<Fill>();
 		slices = new ArrayList<Order>();
+
+		System.out.println("Order Created!" + this.orderId);
 	}
 
 	public int sliceSizes()
