@@ -51,7 +51,7 @@ public class Order implements Serializable
 		this.size = size;
 		this.clientId = clientId;
 		this.instrument = instrument;
-		this.initialMarketPrice = instrument.getInitialMarketPrice();
+		this.initialMarketPrice = instrument.getInitialMarketPrice(); // set the orders initial market price to the price of instrument
 		fills = new ArrayList<Fill>();
 		slices = new ArrayList<Order>();
 
@@ -140,14 +140,14 @@ public class Order implements Serializable
 
 				if(sze <= msze)
 				{
-					 slice.createFill(sze,matchingOrder.initialMarketPrice);
+					 slice.createFill(sze,matchingOrder.initialMarketPrice);//Amir has changed initialMarketPrice to matchingOrder.initialMarketPrice
 					 matchingSlice.createFill(sze, matchingOrder.initialMarketPrice);
 					 break;
 				}
 				// sze>msze
 
-				slice.createFill(msze,initialMarketPrice);
-				matchingSlice.createFill(msze, initialMarketPrice);
+				slice.createFill(msze,matchingOrder.initialMarketPrice);
+				matchingSlice.createFill(msze, matchingOrder.initialMarketPrice);
 			}
 
 			long sze = slice.sizeRemaining();
@@ -156,13 +156,13 @@ public class Order implements Serializable
 			{
 				if(sze >= mParent)
 				{
-					slice.createFill(sze, initialMarketPrice);
-					matchingOrder.createFill(sze, initialMarketPrice);
+					slice.createFill(sze, matchingOrder.initialMarketPrice);
+					matchingOrder.createFill(sze, matchingOrder.initialMarketPrice);
 				}
 				else
 				{
-					slice.createFill(mParent, initialMarketPrice);
-					matchingOrder.createFill(mParent, initialMarketPrice);					
+					slice.createFill(mParent, matchingOrder.initialMarketPrice);
+					matchingOrder.createFill(mParent, matchingOrder.initialMarketPrice);
 				}
 			}
 
@@ -184,14 +184,14 @@ public class Order implements Serializable
 
 				if(sze <= msze)
 				{
-					 createFill(sze, initialMarketPrice);
-					 matchingSlice.createFill(sze, initialMarketPrice);
+					 createFill(sze, matchingOrder.initialMarketPrice);
+					 matchingSlice.createFill(sze, matchingOrder.initialMarketPrice);
 					 break;
 				}
 				// sze>msze
 
-				createFill(msze,initialMarketPrice);
-				matchingSlice.createFill(msze, initialMarketPrice);
+				createFill(msze,matchingOrder.initialMarketPrice);
+				matchingSlice.createFill(msze, matchingOrder.initialMarketPrice);
 			}
 
 			long sze = sizeRemaining();
@@ -201,13 +201,13 @@ public class Order implements Serializable
 			{
 				if(sze >= mParent)
 				{
-					createFill(sze, initialMarketPrice);
-					matchingOrder.createFill(sze, initialMarketPrice);
+					createFill(sze, matchingOrder.initialMarketPrice);
+					matchingOrder.createFill(sze, matchingOrder.initialMarketPrice);
 				}
 				else
 				{
-					createFill(mParent, initialMarketPrice);
-					matchingOrder.createFill(mParent, initialMarketPrice);					
+					createFill(mParent, matchingOrder.initialMarketPrice);
+					matchingOrder.createFill(mParent, matchingOrder.initialMarketPrice);
 				}
 			}
 		}

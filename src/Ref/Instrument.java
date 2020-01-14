@@ -11,7 +11,7 @@ public class Instrument implements Serializable{
 	String isin;
 	String sedol;
 	String bbid;
-	private double initialMarketPrice;
+	private double initialMarketPrice;//initial price for th given instrument
 	public double getInitialMarketPrice() {
 		return initialMarketPrice;
 	}
@@ -20,9 +20,10 @@ public class Instrument implements Serializable{
 	private static final Random RANDOM_NUM_GENERATOR = new Random();
 	public Instrument(Ric ric){
 		this.ric=ric;
-		this.initialMarketPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
+		this.initialMarketPrice =Math.round((199 * RANDOM_NUM_GENERATOR.nextDouble()*100.0))/100.0;// sets random price for instrument when created
 
 	}
+
 	public String toString(){
 		return ric.ric;
 	}
