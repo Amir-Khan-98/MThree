@@ -49,7 +49,15 @@ public class Trader extends Thread implements TradeScreen
                     switch (method)
                     {
                         case newOrder:
-                            newOrder(is.readInt(), (Order) is.readObject());
+
+                            int orderid = is.readInt();
+
+                            System.out.println("TRYING TO SEND AN ORDER " + orderid);
+                            Order tempOrder =  (Order) is.readObject();
+
+
+
+                            newOrder(orderid, tempOrder);
                             break;
                         case price:
                             price(is.readInt(), (Order) is.readObject());
@@ -69,8 +77,8 @@ public class Trader extends Thread implements TradeScreen
                 // If there is no bytes in the stream, it stops for 1 second before going to the start of the while loop.
                 else
                 {
-                    // System.out.println("Trader Waiting for data to be available - sleep 1s");
-                    Thread.sleep(1000);
+                    System.out.println("Trader Waiting for data to be available - sleep 1s");
+                    Thread.sleep(2000);
                 }
             }
         }
@@ -121,18 +129,17 @@ public class Trader extends Thread implements TradeScreen
     }
 
     @Override
-    public void price(int id, Order o) throws InterruptedException, IOException
-    {
+    public void price(int id, Order o) throws InterruptedException, IOException {
+
+        System.out.println(o.toString());
         // TODO should update the trade screen
         // TradeScreen.api....
-        Thread.sleep(2134);
-        if(orders.containsKey(id))
-        {
+        Thread.sleep(3000);
+        if(orders.containsKey(id)) {
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
             sliceOrder(id, (int) orders.get(id).sizeRemaining() / 2);
         }
-        else
-        {
+        else {
             System.out.println("Order with id: "+id+" doesnt exist in Trader: "+this.getName());
         }
     }
