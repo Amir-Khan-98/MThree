@@ -14,6 +14,12 @@ import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
 import TradeScreen.TradeScreen;
 
+/**
+ * Changes to this class to do with the merge
+ *
+ */
+
+
 public class OrderManager
 {
     private static LiveMarketData liveMarketData;
