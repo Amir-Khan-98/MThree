@@ -10,8 +10,6 @@ public class Main
 {
     public static void main(String[] args) throws IOException
     {
-        System.out.println("TEST: this program tests ordermanager");
-
         // start sample clients
         MockClient c1 = new MockClient("Client 1", 2000);
         c1.start();
@@ -51,38 +49,29 @@ class MockClient extends Thread
 
     public void run()
     {
-
         SampleClient client = null;
-        try {
+        try
+        {
             client = new SampleClient(port);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
 
         while(true) {
             try {
-
-
-                System.out.println("RUNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-                if (port == 2000) {
-                    // done "why does this take an arg?"
+                if (port == 2000)
+                {
                     client.sendOrder();
                     int id = client.sendOrder();
                     // TODO client.sendCancel(id);
                     client.messageHandler();
-                } else {
+                }
+                else
+                {
                     client.sendOrder();
                     client.messageHandler();
-
-                    System.out.println("TESTESTESTESTESTESTESTEST");
-
-                    //**
-                    // Code Ever Gets here
-                    //
-                    // */
                 }
-
-                System.out.println("TESTESTESTESTESTESTESTEST");
             } catch (IOException e) {
                 System.out.println("IOException Occured. Message: " + e.getMessage());
                 e.printStackTrace();
