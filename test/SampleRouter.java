@@ -15,7 +15,7 @@ public class SampleRouter extends Thread implements Router
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
     private Socket omConn;
-    private int port;
+    private final int port;
 
     public SampleRouter(String name, int port)
     {
@@ -32,6 +32,7 @@ public class SampleRouter extends Thread implements Router
         try
         {
             omConn = ServerSocketFactory.getDefault().createServerSocket(port).accept();
+            //noinspection InfiniteLoopStatement
             while (true)
             {
                 // .available returns the estimated number of bytes to be read.
@@ -74,9 +75,9 @@ public class SampleRouter extends Thread implements Router
 
     @Override
 
-    /**
-     * This class is used to communicate with the OrderManager
-     * */
+    /*
+      This class is used to communicate with the OrderManager
+      */
     public void routeOrder(int orderId, int sliceId, int size, Instrument i) throws IOException, InterruptedException
     {
         // MockI.show(""+order);
@@ -89,12 +90,11 @@ public class SampleRouter extends Thread implements Router
         double fillPrice;
         if (x>0 && x<0.5){//50% chance of adding or subtracting form initial market price
              fillPrice = i.getUnitPrice()+ 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble(); // adds 0-10% to the initial price to make fill price
-            fillPrice = Math.round(fillPrice*100.0)/100.0;
         }
         else{
              fillPrice = i.getUnitPrice()- 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble();// subs 0-10% to the initial price to make fill price
-            fillPrice = Math.round(fillPrice*100.0)/100.0;
         }
+        fillPrice = Math.round(fillPrice*100.0)/100.0;
 
         Thread.sleep(42);
 

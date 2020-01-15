@@ -7,7 +7,7 @@ import java.util.Random;
 public class Instrument implements Serializable{
 	long id;
 	String name;
-	Ric ric;
+	final Ric ric;
 	String isin;
 	String sedol;
 	String bbid;

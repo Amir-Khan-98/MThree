@@ -8,8 +8,7 @@ import OrderManager.OrderManager;
 
 public class Main
 {
-    public static void main(String[] args) throws IOException
-    {
+    public static void main(String[] args) {
         System.out.println("TEST: this program tests ordermanager");
 
         // start sample clients
@@ -35,13 +34,13 @@ public class Main
         //Create the trader here
         InetSocketAddress trader = new InetSocketAddress("localhost", 2020);
         LiveMarketData liveMarketData = new SampleLiveMarketData(null);
-        (new MockOM("Order Manager", routers, clients, trader, liveMarketData)).start();
+        (new MockOM(routers, clients, trader, liveMarketData)).start();
     }
 }
 
 class MockClient extends Thread
 {
-    int port;
+    final int port;
 
     MockClient(String name, int port)
     {
@@ -49,6 +48,7 @@ class MockClient extends Thread
         this.setName(name);
     }
 
+    @SuppressWarnings("InfiniteLoopStatement")
     public void run()
     {
 
@@ -99,18 +99,18 @@ class MockClient extends Thread
 
 class MockOM extends Thread
 {
-    InetSocketAddress[] clients;
-    InetSocketAddress[] routers;
-    InetSocketAddress trader;
-    LiveMarketData liveMarketData;
+    final InetSocketAddress[] clients;
+    final InetSocketAddress[] routers;
+    final InetSocketAddress trader;
+    final LiveMarketData liveMarketData;
 
-    MockOM(String name, InetSocketAddress[] routers, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData)
+    MockOM(InetSocketAddress[] routers, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData)
     {
         this.clients = clients;
         this.routers = routers;
         this.trader = trader;
         this.liveMarketData = liveMarketData;
-        this.setName(name);
+        this.setName("Order Manager");
     }
 
     @Override

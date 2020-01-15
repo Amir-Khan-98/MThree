@@ -20,10 +20,11 @@ import TradeScreen.TradeScreen;
  */
 
 
+@SuppressWarnings("InfiniteLoopStatement")
 public class OrderManager
 {
     private static LiveMarketData liveMarketData;
-    private HashMap<Integer, Order> orders = new HashMap<Integer, Order>(); // debugger will do this line as it gives state to the object
+    private final HashMap<Integer, Order> orders = new HashMap<Integer, Order>(); // debugger will do this line as it gives state to the object
     // currently recording the number of new order messages we get. TODO why? use it for more?
 //    private int id = 0; // debugger will do this line as it gives state to the object
     private Socket[] orderRouters; // debugger will skip these lines as they dissapear at compile time into 'the object'/stack
@@ -53,7 +54,7 @@ public class OrderManager
 
     public void createConnections(InetSocketAddress[] orderRouters, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData) throws InterruptedException {
 
-        this.liveMarketData = liveMarketData;
+        OrderManager.liveMarketData = liveMarketData;
         this.trader = connect(trader);
         // for the router connections, copy the input array into our object field.
         // but rather than taking the address we create a socket+ephemeral port and connect it to the address
@@ -114,16 +115,13 @@ public class OrderManager
 
                     System.out.println("\nPrint this:" + method);
 
-                    switch (method)
-                    { // determine the type of message and process it
-                        // call the newOrder message with the clientId and the message (clientMessageId,NewOrderSingle)
-                        case "newOrderSingle":
-                            newOrder(clientId, is.readInt(), (NewOrderSingle) is.readObject());
-                            break;
+                    // determine the type of message and process it
+                    // call the newOrder message with the clientId and the message (clientMessageId,NewOrderSingle)
+                    if ("newOrderSingle".equals(method)) {
+                        newOrder(clientId, is.readInt(), (NewOrderSingle) is.readObject());
                         // create a default case which errors with "Unknown message type"+...
-                        default:
-                            System.err.println("Unknown Message type!");
-                            break;
+                    } else {
+                        System.err.println("Unknown Message type!");
                     }
                 }
             }
@@ -186,7 +184,7 @@ public class OrderManager
         System.out.println("I AM A NORMAL ORDER\n");
 
         Order tempOrder = new Order(clientId, clientOrderId, nos.instrument, nos.size);
-        orders.put((int) tempOrder.getOrderId(), tempOrder);
+        orders.put(tempOrder.getOrderId(), tempOrder);
         // send a message to the client with 39=A; // OrdStatus is Fix 39, 'A' is 'Pending New'
         ObjectOutputStream os = new ObjectOutputStream(clients[clientId].getOutputStream());
         // newOrderSingle acknowledgement
@@ -196,7 +194,7 @@ public class OrderManager
 
         System.out.println("\n" + orders + "\n");
 
-        sendOrderToTrader((int) tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
+        sendOrderToTrader(tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
 //        id++;
@@ -278,6 +276,7 @@ public class OrderManager
         }
     }
 
+    @SuppressWarnings("EmptyMethod")
     private void cancelOrder()
     {
 
@@ -379,6 +378,7 @@ public class OrderManager
         os.flush();
     }
 
+    @SuppressWarnings("EmptyMethod")
     private void sendCancel(Order order, Router orderRouter)
     {
         // orderRouter.sendCancel(order);

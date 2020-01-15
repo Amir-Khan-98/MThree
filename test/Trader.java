@@ -10,11 +10,12 @@ import javax.net.ServerSocketFactory;
 import OrderManager.Order;
 import TradeScreen.TradeScreen;
 
+@SuppressWarnings("InfiniteLoopStatement")
 public class Trader extends Thread implements TradeScreen
 {
-    private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
+    private final HashMap<Integer, Order> orders = new HashMap<>();
     private static Socket omConn;
-    private int port;
+    private final int port;
 
     Trader(String name, int port)
     {
@@ -57,7 +58,7 @@ public class Trader extends Thread implements TradeScreen
 
 
 
-                            newOrder((int)tempOrder.getOrderId(), tempOrder);
+                            newOrder(tempOrder.getOrderId(), tempOrder);
                             break;
                         case price:
                             price(is.readInt(), (Order) is.readObject());
@@ -138,9 +139,9 @@ public class Trader extends Thread implements TradeScreen
 
 
         Thread.sleep(3000);
-        if(orders.containsKey( (int) o.getOrderId())) {
+        if(orders.containsKey(o.getOrderId())) {
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
-            sliceOrder(orderId, (int) orders.get( (int) o.getOrderId()).sizeRemaining() / 2);
+            sliceOrder(orderId, orders.get(o.getOrderId()).sizeRemaining() / 2);
         }
         else {
             System.out.println("Order with id: "+orderId+" doesnt exist in Trader: "+this.getName());
