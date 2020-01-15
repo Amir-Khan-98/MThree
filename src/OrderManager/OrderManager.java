@@ -36,7 +36,7 @@ public class OrderManager
         boolean connected = false;
         int tryCounter = 0;
 
-        while (!connected && tryCounter < 600)
+        while (tryCounter < 600)
         {
             try {
                 Socket s = new Socket(location.getHostName(), location.getPort());
@@ -258,7 +258,7 @@ public class OrderManager
     {
         for (Map.Entry<Integer, Order> entry : orders.entrySet())
         {
-            if (entry.getKey().intValue() == orderId)
+            if (entry.getKey() == orderId)
                 continue;
 
             Order matchingOrder = entry.getValue();

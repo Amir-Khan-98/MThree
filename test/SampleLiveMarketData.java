@@ -17,12 +17,8 @@ public class SampleLiveMarketData extends Thread implements LiveMarketData
         this.order = order;
     }
 
-    private void setPrice()
+    private synchronized void setPrice()
     {
-        // In the case of setPrice being called twice simultaneously, the synchronized block forces only one setPrice() call at a time.
-        // Otherwise could get a stale price (no longer accurate);
-        synchronized (this.order)
-        {
             double x = RANDOM_NUM_GENERATOR.nextDouble();//used to determine -+ from Initial price
 
             double updatePrice;
@@ -32,7 +28,6 @@ public class SampleLiveMarketData extends Thread implements LiveMarketData
 //            this.order.unitPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
             this.order.getInstrument().setUnitPrice(updatePrice);
             //this.order.unitPrice = updatePrice; -- dont need this atm as we dont need to chsnge the order prices
-        }
     }
 
     @Override

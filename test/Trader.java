@@ -47,6 +47,7 @@ public class Trader extends Thread implements TradeScreen
                     System.out.println(Thread.currentThread().getName() + " calling: " + method);
                     System.out.println("Received input from stream, object ");
                     // Depending on the stream input, it will perform one of the following methods.
+                    //noinspection DuplicateBranchesInSwitch
                     switch (method)
                     {
                         case newOrder:

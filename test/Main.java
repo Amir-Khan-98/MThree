@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,12 +67,12 @@ class MockClient extends Thread
                 System.out.println("RUNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
                 if (port == 2000) {
                     // done "why does this take an arg?"
-                    client.sendOrder();
+                    Objects.requireNonNull(client).sendOrder();
                     int id = client.sendOrder();
                     // TODO client.sendCancel(id);
                     client.messageHandler();
                 } else {
-                    client.sendOrder();
+                    Objects.requireNonNull(client).sendOrder();
                     client.messageHandler();
 
                     System.out.println("TESTESTESTESTESTESTESTEST");

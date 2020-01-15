@@ -3,7 +3,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,7 +19,7 @@ public class SampleClient extends Mock implements Client
 {
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
-    private static final HashMap OUT_QUEUE = new HashMap(); // queue for outgoing orders
+    private static final Map OUT_QUEUE = new HashMap(); // queue for outgoing orders
     private final AtomicInteger messageId = new AtomicInteger( 0); // message id number
     private Socket omConn; // connection to order manager
 
@@ -115,7 +117,7 @@ public class SampleClient extends Mock implements Client
                     for (String fixTag : fixTags) {
                         String[] tag_value = fixTag.split("=");
 
-                        System.out.println(tag_value.toString());
+                        System.out.println(Arrays.toString(tag_value));
 
 
                         switch (tag_value[0]) {
