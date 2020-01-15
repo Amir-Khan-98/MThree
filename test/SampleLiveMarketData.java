@@ -36,7 +36,7 @@ public class SampleLiveMarketData extends Thread implements LiveMarketData
             }
 //            this.order.unitPrice = 199 * RANDOM_NUM_GENERATOR.nextDouble();
             this.order.getInstrument().setUnitPrice(updatePrice);
-            this.order.unitPrice = updatePrice;
+            //this.order.unitPrice = updatePrice; -- dont need this atm as we dont need to chsnge the order prices
         }
     }
 
