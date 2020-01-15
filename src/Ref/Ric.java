@@ -3,7 +3,7 @@ package Ref;
 import java.io.Serializable;
 
 public class Ric implements Serializable{
-	public final String ric;
+	public String ric;
 	public Ric(String ric){
 		this.ric=ric;
 	}

@@ -14,10 +14,18 @@ import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
 import TradeScreen.TradeScreen;
 
+/**
+ * Changes to this class to do with the merge
+ *
+ */
+
+
 public class OrderManager
 {
     private static LiveMarketData liveMarketData;
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>(); // debugger will do this line as it gives state to the object
+    // currently recording the number of new order messages we get. TODO why? use it for more?
+//    private int id = 0; // debugger will do this line as it gives state to the object
     private Socket[] orderRouters; // debugger will skip these lines as they dissapear at compile time into 'the object'/stack
     private Socket[] clients;
     private Socket trader;
@@ -27,7 +35,7 @@ public class OrderManager
         boolean connected = false;
         int tryCounter = 0;
 
-        while (tryCounter < 600)
+        while (!connected && tryCounter < 600)
         {
             try {
                 Socket s = new Socket(location.getHostName(), location.getPort());
@@ -45,7 +53,7 @@ public class OrderManager
 
     public void createConnections(InetSocketAddress[] orderRouters, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData) throws InterruptedException {
 
-        OrderManager.liveMarketData = liveMarketData;
+        this.liveMarketData = liveMarketData;
         this.trader = connect(trader);
         // for the router connections, copy the input array into our object field.
         // but rather than taking the address we create a socket+ephemeral port and connect it to the address
@@ -75,13 +83,23 @@ public class OrderManager
 
         createConnections(orderRouters, clients,trader, liveMarketData);
 
+
         int clientId, routerId;
         Socket client, router;
 
+        int count = 0;
         // main loop, wait for a message, then process it
         while (true) {
 
-            Thread.sleep(2000); // Just chill for a bit, make the output a bit more manageable.
+            System.out.println("WHILE COUNTER " + count);
+            count++;
+
+            Thread.sleep(2000);
+
+            // TODO this is pretty cpu intensive, use a more modern polling/interrupt/select approach
+            // we want to use the arrayindex as the clientId, so use traditional for loop instead of foreach
+
+
 
             //CLIENTS
             for (clientId = 0; clientId < this.clients.length; clientId++)
@@ -90,10 +108,11 @@ public class OrderManager
                 client = this.clients[clientId];
                 if (0 < client.getInputStream().available())
                 { // if we have part of a message ready to read, assuming this doesn't fragment messages
-                    // create an object inputstream, this is a pretty stupid way of doing it, why not create it once rather than every time around the loop
-                    ObjectInputStream is = new ObjectInputStream(client.getInputStream());
+                    ObjectInputStream is = new ObjectInputStream(client.getInputStream()); // create an object inputstream, this is a pretty stupid way of doing it, why not create it once rather than every time around the loop
                     String method = (String) is.readObject();
                     System.out.println(Thread.currentThread().getName() + " calling " + method);
+
+                    System.out.println("\nPrint this:" + method);
 
                     switch (method)
                     { // determine the type of message and process it
@@ -109,9 +128,11 @@ public class OrderManager
                 }
             }
 
+
             //ROUTERS
             for (routerId = 0; routerId < this.orderRouters.length; routerId++)
             { // check if we have data on any of the sockets
+
                 router = this.orderRouters[routerId];
                 if (0 < router.getInputStream().available())
                 { // if we have part of a message ready to read, assuming this doesn't fragment messages
@@ -122,6 +143,8 @@ public class OrderManager
                     switch (method)
                     { // determine the type of message and process it
                         case "bestPrice":
+
+                            System.out.println("We are int the best price");
                             int OrderId = is.readInt();
                             int SliceId = is.readInt();
                             Order slice = orders.get(OrderId).getSlices().get(SliceId);
@@ -137,6 +160,7 @@ public class OrderManager
                     }
                 }
             }
+
 
             //Trader
             if (0 < this.trader.getInputStream().available())
@@ -158,19 +182,21 @@ public class OrderManager
     }
 
     private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException {
+
+        System.out.println("I AM A NORMAL ORDER\n");
+
         Order tempOrder = new Order(clientId, clientOrderId, nos.instrument, nos.size);
-        orders.put(tempOrder.getOrderId(), tempOrder);
-        // send a message to the client with 39=A;
-        // OrdStatus is Fix 39, 'A' is 'Pending New'
+        orders.put((int) tempOrder.getOrderId(), tempOrder);
+        // send a message to the client with 39=A; // OrdStatus is Fix 39, 'A' is 'Pending New'
         ObjectOutputStream os = new ObjectOutputStream(clients[clientId].getOutputStream());
         // newOrderSingle acknowledgement
-        // ClientOrderId is 11=
+        // ClOrdId is 11=
         os.writeObject("11=" + clientOrderId + ";35=A;39=A;");
         os.flush();
 
-        System.out.println("\n" + orders + "\n"); // Might be worth making a method to print this out so that its a bit more readable, but not necessary
+        System.out.println("\n" + orders + "\n");
 
-        sendOrderToTrader(tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
+        sendOrderToTrader((int) tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
 //        id++;
@@ -206,7 +232,9 @@ public class OrderManager
 
     public void sliceOrder(int orderId, int sliceSize) throws IOException
     {
-        System.out.println("SliceOrder called with orderId: " +orderId+", sliceSize: "+sliceSize);
+
+        System.out.println("I AM A SLICE ORDER\n");
+
         Order o = orders.get(orderId);
         // slice the order. We have to check this is a valid size.
         // Order has a list of slices, and a list of fills, each slice is a childorder and each fill is associated with either a child order or the original order
@@ -232,7 +260,7 @@ public class OrderManager
     {
         for (Map.Entry<Integer, Order> entry : orders.entrySet())
         {
-            if (entry.getKey() == orderId)
+            if (entry.getKey().intValue() == orderId)
                 continue;
 
             Order matchingOrder = entry.getValue();
@@ -250,7 +278,6 @@ public class OrderManager
         }
     }
 
-    @SuppressWarnings("EmptyMethod")
     private void cancelOrder()
     {
 
@@ -258,7 +285,9 @@ public class OrderManager
 
     private void newFill(int orderId, int sliceId, int size, double price) throws IOException
     {
-        System.out.println("The incoming orderId: " + orderId);
+
+        System.out.println("THE INCOMING ORDER ID IS: " + orderId);
+
         System.out.println("The Orders Array is!" +orders);
         if(orders.containsKey(orderId))
         {
@@ -274,7 +303,7 @@ public class OrderManager
         }
         // If the order we are looking for is not there look for the order inside all the orders.
         else
-        {
+            {
             // For each order in orders
             for (Order order: orders.values())
             {
@@ -284,7 +313,7 @@ public class OrderManager
                     // If the inner order (the slice) is what we are looking for.
                     if(innerOrder.getOrderId() == orderId)
                     {
-                        System.out.println("Found the order inside another order!" + innerOrder.toString()+ " Sliceid: "+sliceId);
+                        System.out.println("Found the order inside another order!!!!!!!!!!!!!!!!!!!!!!!" + innerOrder.toString()+ " Sliceid: "+sliceId);
                         order.getSlices().get(sliceId).createFill(size, price);
 
                         if (innerOrder.sizeRemaining() == 0)
@@ -294,6 +323,7 @@ public class OrderManager
 
                         sendOrderToTrader(orderId, innerOrder, TradeScreen.api.fill);
                     }
+
                 }
             }
         }
@@ -317,6 +347,7 @@ public class OrderManager
         order.setBestPrices(new long[orderRouters.length]);
         order.setBestPriceCount(0L); //  L = long to compiler
     }
+
 
     /**
      * Use in best price.
@@ -348,7 +379,6 @@ public class OrderManager
         os.flush();
     }
 
-    @SuppressWarnings("EmptyMethod")
     private void sendCancel(Order order, Router orderRouter)
     {
         // orderRouter.sendCancel(order);

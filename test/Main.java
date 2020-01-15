@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,13 +35,13 @@ public class Main
         //Create the trader here
         InetSocketAddress trader = new InetSocketAddress("localhost", 2020);
         LiveMarketData liveMarketData = new SampleLiveMarketData(null);
-        (new MockOM(routers, clients, trader, liveMarketData)).start();
+        (new MockOM("Order Manager", routers, clients, trader, liveMarketData)).start();
     }
 }
 
 class MockClient extends Thread
 {
-    final int port;
+    int port;
 
     MockClient(String name, int port)
     {
@@ -50,7 +49,6 @@ class MockClient extends Thread
         this.setName(name);
     }
 
-    @SuppressWarnings("InfiniteLoopStatement")
     public void run()
     {
 
@@ -63,16 +61,28 @@ class MockClient extends Thread
 
         while(true) {
             try {
+
+
+                System.out.println("RUNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
                 if (port == 2000) {
                     // done "why does this take an arg?"
-                    Objects.requireNonNull(client).sendOrder();
+                    client.sendOrder();
                     int id = client.sendOrder();
                     // TODO client.sendCancel(id);
                     client.messageHandler();
                 } else {
-                    Objects.requireNonNull(client).sendOrder();
+                    client.sendOrder();
                     client.messageHandler();
+
+                    System.out.println("TESTESTESTESTESTESTESTEST");
+
+                    //**
+                    // Code Ever Gets here
+                    //
+                    // */
                 }
+
+                System.out.println("TESTESTESTESTESTESTESTEST");
             } catch (IOException e) {
                 System.out.println("IOException Occured. Message: " + e.getMessage());
                 e.printStackTrace();
@@ -89,18 +99,18 @@ class MockClient extends Thread
 
 class MockOM extends Thread
 {
-    final InetSocketAddress[] clients;
-    final InetSocketAddress[] routers;
-    final InetSocketAddress trader;
-    final LiveMarketData liveMarketData;
+    InetSocketAddress[] clients;
+    InetSocketAddress[] routers;
+    InetSocketAddress trader;
+    LiveMarketData liveMarketData;
 
-    MockOM(InetSocketAddress[] routers, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData)
+    MockOM(String name, InetSocketAddress[] routers, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData)
     {
         this.clients = clients;
         this.routers = routers;
         this.trader = trader;
         this.liveMarketData = liveMarketData;
-        this.setName("Order Manager");
+        this.setName(name);
     }
 
     @Override

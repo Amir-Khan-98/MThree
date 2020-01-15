@@ -6,9 +6,9 @@ import Ref.Instrument;
 
 public class NewOrderSingle implements Serializable
 {
-	public final int size;
-	public final float price;
-	public final Instrument instrument;
+	public int size;
+	public float price;
+	public Instrument instrument;
 
 	public NewOrderSingle(int size, float price, Instrument instrument)
 	{
