@@ -12,6 +12,7 @@ import Database.Database;
 import LiveMarketData.LiveMarketData;
 import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
+import Ref.Instrument;
 import TradeScreen.TradeScreen;
 
 public class OrderManager
@@ -122,18 +123,35 @@ public class OrderManager
                     switch (method)
                     { // determine the type of message and process it
                         case "bestPrice":
-                            int OrderId = is.readInt();
-                            int SliceId = is.readInt();
-                            Order slice = orders.get(OrderId).getSlices().get(SliceId);
+                            int orderId = is.readInt();
+                            int sliceId = is.readInt();
+                            Order slice = orders.get(orderId).getSlices().get(sliceId);
                             slice.getBestPrices()[routerId] = is.readLong();
                             slice.setBestPriceCount(slice.getBestPriceCount() + 1);
 
                             if (slice.getBestPriceCount() == slice.getBestPrices().length)
-                                reallyRouteOrder(SliceId, slice);
+                                reallyRouteOrder(sliceId, slice);
                             break;
                         case "newFill":
                             newFill(is.readInt(), is.readInt(), is.readInt(), is.readLong());
                             break;
+                        case "sendCancel":
+                            // This currently has not implementation, but it should be called like this.
+
+                            // --- This needs to be turned into an order object and a router, then into the method.
+
+                            // THIS IS A TEST THIS MIGHT BREAK EVERYTHING
+                            int orderId2 = is.readInt();
+                            int sliceId2 = is.readInt();
+                            int size = is.readInt();
+                            Instrument instrument = (Instrument)is.readObject();
+
+
+                            // where the fuck am i supposed to get this router from!?!?
+                            sendCancel(orders.get(orderId2), router);
+
+                        default:
+                            System.err.println("(OrderManager)Method: "+method+" is not a valid method.");
                     }
                 }
             }
@@ -346,10 +364,19 @@ public class OrderManager
         os.flush();
     }
 
-    private void sendCancel(Order order, Router orderRouter)
+    private void sendCancel(Order order, Socket orderRouter)
     {
         // orderRouter.sendCancel(order);
         // order.orderRouter.writeObject(order);
+        try
+        {
+            ObjectOutputStream os = new ObjectOutputStream(orderRouter.getOutputStream()); // create an object outputstream, this is a pretty stupid way of doing it, why not create it once rather than every time around the loop
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+
     }
 
     private void price(int orderId, Order o) throws IOException

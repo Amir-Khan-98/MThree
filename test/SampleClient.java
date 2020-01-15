@@ -92,7 +92,6 @@ public class SampleClient extends Mock implements Client
     @Override
     public void messageHandler()
     {
-
         ObjectInputStream is;
         try
         {

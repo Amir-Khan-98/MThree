@@ -53,6 +53,12 @@ public class SampleRouter extends Thread implements Router
                         case priceAtSize:
                             priceAtSize(is.readInt(), is.readInt(), (Instrument) is.readObject(), is.readInt());
                             break;
+                        case sendCancel:
+                            // This currently has not implementation, but it should be called like this.
+                            sendCancel(is.readInt(), is.readInt(), is.readInt(), (Instrument) is.readObject());
+                            break;
+                        default:
+                            System.err.println("Method: "+methodName.toString()+" is not a valid method.");
                     }
                 }
                 else
@@ -125,6 +131,26 @@ public class SampleRouter extends Thread implements Router
 
     @Override
     public void sendCancel(int id, int sliceId, int size, Instrument i)
-    { // MockI.show(""+order);
+    {
+        // MockI.show(""+order);
+        // send the cancel signal in the output stream of something 'C' in sample client
+        try
+        {
+            /* THIS SHIT HASNT ACTUALLY BEEN IMPLEMENTED YET!*/
+            os = new ObjectOutputStream(omConn.getOutputStream());
+            os.writeObject("bestPrice");
+            os.writeInt(id);
+            os.writeInt(sliceId);
+            os.writeInt(size);
+            os.writeObject(i);
+            // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
+            os.flush();
+        } catch (IOException e)
+        {
+            System.err.println("IOException occured in sendCancel, message: "+e.getMessage());
+            e.printStackTrace();
+        }
+
+
     }
 }
