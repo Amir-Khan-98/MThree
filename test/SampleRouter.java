@@ -13,6 +13,9 @@ import Ref.Ric;
 public class SampleRouter extends Thread implements Router
 {
     private static final Random RANDOM_NUM_GENERATOR = new Random();
+
+
+
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
     private Socket omConn;
     private int port;
@@ -129,5 +132,9 @@ public class SampleRouter extends Thread implements Router
     @Override
     public void sendCancel(int id, int sliceId, int size, Instrument i)
     { // MockI.show(""+order);
+    }
+
+    public static Instrument[] getINSTRUMENTS() {
+        return INSTRUMENTS;
     }
 }
