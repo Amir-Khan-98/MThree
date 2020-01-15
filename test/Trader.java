@@ -10,11 +10,12 @@ import javax.net.ServerSocketFactory;
 import OrderManager.Order;
 import TradeScreen.TradeScreen;
 
+@SuppressWarnings("InfiniteLoopStatement")
 public class Trader extends Thread implements TradeScreen
 {
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
     private static Socket omConn;
-    private int port;
+    private final int port;
 
     Trader(String name, int port)
     {
@@ -44,20 +45,15 @@ public class Trader extends Thread implements TradeScreen
                     // Reads in the message from the stream.
                     api method = (api) is.readObject();
                     System.out.println(Thread.currentThread().getName() + " calling: " + method);
-                    System.out.println("Received input from stream, object ");
                     // Depending on the stream input, it will perform one of the following methods.
+                    //noinspection DuplicateBranchesInSwitch
                     switch (method)
                     {
                         case newOrder:
-
                             int orderid = is.readInt();
-
-                            System.out.println("TRYING TO SEND AN ORDER " + orderid);
+                            System.out.println("newOrder called with orderId: " + orderid);
                             Order tempOrder =  (Order) is.readObject();
-
-
-
-                            newOrder((int)tempOrder.getOrderId(), tempOrder);
+                            newOrder(tempOrder.getOrderId(), tempOrder);
                             break;
                         case price:
                             price(is.readInt(), (Order) is.readObject());
@@ -130,17 +126,16 @@ public class Trader extends Thread implements TradeScreen
     @Override
     public void price(int orderId, Order o) throws InterruptedException, IOException {
 
-        System.out.println("THE ID IS: " + orderId + " OBJECT!!!!!!" + o.toString());
+        System.out.println("Price called in Trader ("+this.getName()+") with orderId: " + orderId + ", Order.toString(): " + o.toString());
         // TODO should update the trade screen
         // TradeScreen.api....
 
-        System.out.println("The whole fucking order is here: " + orders);
-
+        System.out.println("\nThe whole f****** orders map is here: " + orders+"\n");
 
         Thread.sleep(3000);
-        if(orders.containsKey( (int) o.getOrderId())) {
+        if(orders.containsKey(o.getOrderId())) {
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
-            sliceOrder(orderId, (int) orders.get( (int) o.getOrderId()).sizeRemaining() / 2);
+            sliceOrder(orderId, orders.get(o.getOrderId()).sizeRemaining() / 2);
         }
         else {
             System.out.println("Order with id: "+orderId+" doesnt exist in Trader: "+this.getName());

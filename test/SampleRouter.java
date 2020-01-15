@@ -18,7 +18,7 @@ public class SampleRouter extends Thread implements Router
 
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
     private Socket omConn;
-    private int port;
+    private final int port;
 
     public SampleRouter(String name, int port)
     {
@@ -35,6 +35,7 @@ public class SampleRouter extends Thread implements Router
         try
         {
             omConn = ServerSocketFactory.getDefault().createServerSocket(port).accept();
+            //noinspection InfiniteLoopStatement
             while (true)
             {
                 // .available returns the estimated number of bytes to be read.
@@ -48,9 +49,10 @@ public class SampleRouter extends Thread implements Router
                     switch (methodName)
                     {
                         case routeOrder:
-//                            int[] readIntArray = new int[]{is.readInt(), is.readInt(), is.readInt()};
-//                            System.out.println("\n \n \n INTS: "+readIntArray[0]+readIntArray[0]+ "\n\n\n");
-                            routeOrder(is.readInt(), is.readInt(), is.readInt(), (Instrument) is.readObject());
+                            // Instead of readingInts as the arguments to routeOrder(), read them and store them so we can see what they are.
+                            int[] readIntArray = new int[]{is.readInt(), is.readInt(), is.readInt()};
+                            System.out.println("RouteOrder called, read ints: Route Order INTS: "+readIntArray[0]+readIntArray[1]+readIntArray[2]);
+                            routeOrder(readIntArray[0], readIntArray[1], readIntArray[2], (Instrument) is.readObject());
                             break;
                         case priceAtSize:
                             priceAtSize(is.readInt(), is.readInt(), (Instrument) is.readObject(), is.readInt());
@@ -76,7 +78,6 @@ public class SampleRouter extends Thread implements Router
     }
 
     @Override
-
     /**
      * This class is used to communicate with the OrderManager
      * */
@@ -90,17 +91,16 @@ public class SampleRouter extends Thread implements Router
         double x = RANDOM_NUM_GENERATOR.nextDouble();//used to determine -+ from Initial price
 
         double fillPrice;
-        if (x>0 && x<0.5){//50% chance of adding or subtracting form initial market price
-             fillPrice = i.getUnitPrice()+ 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble(); // adds 0-10% to the initial price to make fill price
+        if (x > 0 && x < 0.5){//50% chance of adding or subtracting form initial market price
+            fillPrice = i.getUnitPrice()+ 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble(); // adds 0-10% to the initial price to make fill price
             fillPrice = Math.round(fillPrice*100.0)/100.0;
         }
         else{
-             fillPrice = i.getUnitPrice()- 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble();// subs 0-10% to the initial price to make fill price
+            fillPrice = i.getUnitPrice()- 0.1*i.getUnitPrice()*RANDOM_NUM_GENERATOR.nextDouble();// subs 0-10% to the initial price to make fill price
             fillPrice = Math.round(fillPrice*100.0)/100.0;
         }
 
         Thread.sleep(42);
-
 
         //Write and flush
         os = new ObjectOutputStream(omConn.getOutputStream());
@@ -113,8 +113,6 @@ public class SampleRouter extends Thread implements Router
         // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
         os.flush();
     }
-
-
 
     @Override
     public void priceAtSize(int id, int sliceId, Instrument i, int size) throws IOException

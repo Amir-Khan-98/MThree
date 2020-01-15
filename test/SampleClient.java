@@ -3,22 +3,24 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import OrderClient.Client;
 import OrderClient.NewOrderSingle;
-import OrderManager.Order;
 import Ref.Instrument;
 import Ref.Ric;
 
+@SuppressWarnings("InfiniteLoopStatement")
 public class SampleClient extends Mock implements Client
 {
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
-    private static final HashMap OUT_QUEUE = new HashMap(); // queue for outgoing orders
-    private volatile AtomicInteger messageId = new AtomicInteger( 0); // message id number
+    private static final Map OUT_QUEUE = new HashMap(); // queue for outgoing orders
+    private final AtomicInteger messageId = new AtomicInteger( 0); // message id number
     private Socket omConn; // connection to order manager
 
     public SampleClient(int port) throws IOException
@@ -37,6 +39,7 @@ public class SampleClient extends Mock implements Client
         NewOrderSingle nos = new NewOrderSingle(size, instid, instrument);
 
         show("sendOrder: messageId=" + messageId + " size=" + size + " instrument=" + INSTRUMENTS[instid].toString());
+        //noinspection unchecked
         OUT_QUEUE.put(messageId, nos);
 
         if (omConn.isConnected())
@@ -87,7 +90,7 @@ public class SampleClient extends Mock implements Client
     enum methods
     {
         newOrderSingleAcknowledgement, dontKnow
-    };
+    }
 
     @Override
     public void messageHandler()
@@ -111,15 +114,13 @@ public class SampleClient extends Mock implements Client
                     methods whatToDo = methods.dontKnow;
                     // String[][] fixTagsValues=new String[fixTags.length][2];
 
-                    for (int i = 0; i < fixTags.length; i++)
-                    {
-                        String[] tag_value = fixTags[i].split("=");
+                    for (String fixTag : fixTags) {
+                        String[] tag_value = fixTag.split("=");
 
-                        System.out.println(tag_value.toString());
+                        System.out.println(Arrays.toString(tag_value));
 
 
-                        switch (tag_value[0])
-                        {
+                        switch (tag_value[0]) {
                             case "11":
                                 orderId = Integer.parseInt(tag_value[1]);
                                 break;
@@ -139,10 +140,8 @@ public class SampleClient extends Mock implements Client
                                 break;
                         }
                     }
-                    switch (whatToDo)
-                    {
-                        case newOrderSingleAcknowledgement:
-                            newOrderSingleAcknowledgement(orderId);
+                    if (whatToDo == methods.newOrderSingleAcknowledgement) {
+                        newOrderSingleAcknowledgement(orderId);
                     }
 					
 //					message=connection.getMessage();
