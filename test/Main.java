@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,6 +11,8 @@ public class Main
 {
     public static void main(String[] args) throws IOException
     {
+        System.out.println("TEST: this program tests ordermanager");
+
         // start sample clients
         MockClient c1 = new MockClient("Client 1", 2000);
         c1.start();
@@ -20,8 +23,6 @@ public class Main
         (new SampleRouter("Router BATE", 2011)).start();
 
         (new Trader("Trader James", 2020)).start();
-        //(new Trader("Trader Dave", 2020)).start();
-
         // start order manager
 
         //Creating the clients here
@@ -35,13 +36,13 @@ public class Main
         //Create the trader here
         InetSocketAddress trader = new InetSocketAddress("localhost", 2020);
         LiveMarketData liveMarketData = new SampleLiveMarketData(null);
-        (new MockOM("Order Manager", routers, clients, trader, liveMarketData)).start();
+        (new MockOM(routers, clients, trader, liveMarketData)).start();
     }
 }
 
 class MockClient extends Thread
 {
-    int port;
+    final int port;
 
     MockClient(String name, int port)
     {
@@ -49,29 +50,27 @@ class MockClient extends Thread
         this.setName(name);
     }
 
+    @SuppressWarnings("InfiniteLoopStatement")
     public void run()
     {
+
         SampleClient client = null;
-        try
-        {
+        try {
             client = new SampleClient(port);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
         while(true) {
             try {
-                if (port == 2000)
-                {
-                    client.sendOrder();
+                if (port == 2000) {
+                    // done "why does this take an arg?"
+                    Objects.requireNonNull(client).sendOrder();
                     int id = client.sendOrder();
                     // TODO client.sendCancel(id);
                     client.messageHandler();
-                }
-                else
-                {
-                    client.sendOrder();
+                } else {
+                    Objects.requireNonNull(client).sendOrder();
                     client.messageHandler();
                 }
             } catch (IOException e) {
@@ -90,18 +89,18 @@ class MockClient extends Thread
 
 class MockOM extends Thread
 {
-    InetSocketAddress[] clients;
-    InetSocketAddress[] routers;
-    InetSocketAddress trader;
-    LiveMarketData liveMarketData;
+    final InetSocketAddress[] clients;
+    final InetSocketAddress[] routers;
+    final InetSocketAddress trader;
+    final LiveMarketData liveMarketData;
 
-    MockOM(String name, InetSocketAddress[] routers, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData)
+    MockOM(InetSocketAddress[] routers, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData)
     {
         this.clients = clients;
         this.routers = routers;
         this.trader = trader;
         this.liveMarketData = liveMarketData;
-        this.setName(name);
+        this.setName("Order Manager");
     }
 
     @Override

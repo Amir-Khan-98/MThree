@@ -15,7 +15,7 @@ public class SampleRouter extends Thread implements Router
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
     private Socket omConn;
-    private int port;
+    private final int port;
 
     public SampleRouter(String name, int port)
     {
@@ -32,6 +32,7 @@ public class SampleRouter extends Thread implements Router
         try
         {
             omConn = ServerSocketFactory.getDefault().createServerSocket(port).accept();
+            //noinspection InfiniteLoopStatement
             while (true)
             {
                 // .available returns the estimated number of bytes to be read.
@@ -65,9 +66,9 @@ public class SampleRouter extends Thread implements Router
         {
             if(e.getClass() == IOException.class)
                 System.out.println("IOException occurred, message: "+e.getMessage());
-            else if(e.getClass() == ClassNotFoundException.class)
+            if(e.getClass() == ClassNotFoundException.class)
                 System.out.println("ClassNotFoundException occurred, message: "+e.getMessage());
-            else if(e.getClass() == InterruptedException.class)
+            if(e.getClass() == InterruptedException.class)
                 System.out.println("InterruptedException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }

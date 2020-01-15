@@ -10,11 +10,12 @@ import javax.net.ServerSocketFactory;
 import OrderManager.Order;
 import TradeScreen.TradeScreen;
 
+@SuppressWarnings("InfiniteLoopStatement")
 public class Trader extends Thread implements TradeScreen
 {
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
     private static Socket omConn;
-    private int port;
+    private final int port;
 
     Trader(String name, int port)
     {
@@ -45,6 +46,7 @@ public class Trader extends Thread implements TradeScreen
                     api method = (api) is.readObject();
                     System.out.println(Thread.currentThread().getName() + " calling: " + method);
                     // Depending on the stream input, it will perform one of the following methods.
+                    //noinspection DuplicateBranchesInSwitch
                     switch (method)
                     {
                         case newOrder:
@@ -80,9 +82,9 @@ public class Trader extends Thread implements TradeScreen
         {
             if(e.getClass() == IOException.class)
                 System.out.println("IOException occurred, message: "+e.getMessage());
-            else if(e.getClass() == ClassNotFoundException.class)
+            if(e.getClass() == ClassNotFoundException.class)
                 System.out.println("ClassNotFoundException occurred, message: "+e.getMessage());
-            else if(e.getClass() == InterruptedException.class)
+            if(e.getClass() == InterruptedException.class)
                 System.out.println("InterruptedException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }
@@ -131,9 +133,9 @@ public class Trader extends Thread implements TradeScreen
         System.out.println("\nThe whole f****** orders map is here: " + orders+"\n");
 
         Thread.sleep(3000);
-        if(orders.containsKey( (int) o.getOrderId())) {
+        if(orders.containsKey(o.getOrderId())) {
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
-            sliceOrder(orderId, (int) orders.get( (int) o.getOrderId()).sizeRemaining() / 2);
+            sliceOrder(orderId, orders.get(o.getOrderId()).sizeRemaining() / 2);
         }
         else {
             System.out.println("Order with id: "+orderId+" doesnt exist in Trader: "+this.getName());

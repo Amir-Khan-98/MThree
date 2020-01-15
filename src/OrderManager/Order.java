@@ -11,10 +11,10 @@ import Ref.Instrument;
 public class Order implements Serializable
 {
 
-	private int orderId;
+	private final int orderId;
 	public long orderRouter;
-	private long clientOrderID;
-	private int size;
+	private final long clientOrderID;
+	private final int size;
 	private long[] bestPrices;
 	private long bestPriceCount;
 
@@ -214,6 +214,7 @@ public class Order implements Serializable
 		}
 	}
 
+	@SuppressWarnings("EmptyMethod")
 	public void cancel()
 	{
 		// state=cancelled
@@ -338,8 +339,8 @@ class Basket
 class Fill implements Serializable
 {
 	long id;
-	long size;
-	double price;
+	final long size;
+	final double price;
 	Fill(long size, double price){
 		this.size = size;
 		this.price = price;

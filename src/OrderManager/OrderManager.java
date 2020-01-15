@@ -27,7 +27,7 @@ public class OrderManager
         boolean connected = false;
         int tryCounter = 0;
 
-        while (!connected && tryCounter < 600)
+        while (tryCounter < 600)
         {
             try {
                 Socket s = new Socket(location.getHostName(), location.getPort());
@@ -45,7 +45,7 @@ public class OrderManager
 
     public void createConnections(InetSocketAddress[] orderRouters, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData) throws InterruptedException {
 
-        this.liveMarketData = liveMarketData;
+        OrderManager.liveMarketData = liveMarketData;
         this.trader = connect(trader);
         // for the router connections, copy the input array into our object field.
         // but rather than taking the address we create a socket+ephemeral port and connect it to the address
@@ -173,6 +173,7 @@ public class OrderManager
         sendOrderToTrader(tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
+//        id++;
     }
 
     private void sendOrderToTrader(int orderId, Order o, Object method) throws IOException
@@ -231,7 +232,7 @@ public class OrderManager
     {
         for (Map.Entry<Integer, Order> entry : orders.entrySet())
         {
-            if (entry.getKey().intValue() == orderId)
+            if (entry.getKey() == orderId)
                 continue;
 
             Order matchingOrder = entry.getValue();
@@ -249,6 +250,7 @@ public class OrderManager
         }
     }
 
+    @SuppressWarnings("EmptyMethod")
     private void cancelOrder()
     {
 
@@ -346,6 +348,7 @@ public class OrderManager
         os.flush();
     }
 
+    @SuppressWarnings("EmptyMethod")
     private void sendCancel(Order order, Router orderRouter)
     {
         // orderRouter.sendCancel(order);
