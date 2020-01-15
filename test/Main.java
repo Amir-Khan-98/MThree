@@ -22,6 +22,8 @@ public class Main
         (new SampleRouter("Router BATE", 2011)).start();
 
         (new Trader("Trader James", 2020)).start();
+        //(new Trader("Trader Dave", 2020)).start();
+
         // start order manager
 
         //Creating the clients here
