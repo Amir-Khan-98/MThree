@@ -22,6 +22,7 @@ public class Order implements Serializable
 	private Instrument instrument;
 	public double unitPrice;
 	private ArrayList<Order> slices;
+	private double initialMarketPrice;
 
 	@Override
 	public String toString() {
