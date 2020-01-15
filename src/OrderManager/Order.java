@@ -22,6 +22,7 @@ public class Order implements Serializable
 	private Instrument instrument;
 	public double unitPrice;
 	private ArrayList<Order> slices;
+	private double initialMarketPrice;
 
 	@Override
 	public String toString() {
@@ -213,6 +214,7 @@ public class Order implements Serializable
 		}
 	}
 
+	@SuppressWarnings("EmptyMethod")
 	public void cancel()
 	{
 		// state=cancelled
@@ -270,6 +272,61 @@ public class Order implements Serializable
 		return slices;
 	}
 
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
+	}
+
+	public long getOrderRouter() {
+		return orderRouter;
+	}
+
+	public void setOrderRouter(long orderRouter) {
+		this.orderRouter = orderRouter;
+	}
+
+	public long getClientOrderID() {
+		return clientOrderID;
+	}
+
+	public void setClientOrderID(long clientOrderID) {
+		this.clientOrderID = clientOrderID;
+	}
+
+	public int getSize() {
+		return size;
+	}
+
+	public void setSize(int size) {
+		this.size = size;
+	}
+
+	public void setClientId(long clientId) {
+		this.clientId = clientId;
+	}
+
+	public void setInstrument(Instrument instrument) {
+		this.instrument = instrument;
+	}
+
+	public double getInitialMarketPrice() {
+		return initialMarketPrice;
+	}
+
+	public void setInitialMarketPrice(double initialMarketPrice) {
+		this.initialMarketPrice = initialMarketPrice;
+	}
+
+	public void setSlices(ArrayList<Order> slices) {
+		this.slices = slices;
+	}
+
+	public ArrayList<Fill> getFills() {
+		return fills;
+	}
+
+	public void setFills(ArrayList<Fill> fills) {
+		this.fills = fills;
+	}
 }
 
 class Basket
@@ -282,8 +339,8 @@ class Basket
 class Fill implements Serializable
 {
 	long id;
-	long size;
-	double price;
+	final long size;
+	final double price;
 	Fill(long size, double price){
 		this.size = size;
 		this.price = price;
