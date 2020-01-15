@@ -6,6 +6,8 @@ import java.util.Random;
 
 import javax.net.ServerSocketFactory;
 
+import OrderClient.Client;
+import OrderManager.Order;
 import OrderRouter.Router;
 import Ref.Instrument;
 import Ref.Ric;
@@ -55,7 +57,22 @@ public class SampleRouter extends Thread implements Router
                             break;
                         case sendCancel:
                             // This currently has not implementation, but it should be called like this.
-                            sendCancel(is.readInt(), is.readInt(), is.readInt(), (Instrument) is.readObject());
+
+                            //TODO rewrite this to check the input and if the order exists
+
+                            Order tempOrder = (Order) is.readObject();
+                            int clientId = is.readInt();
+
+                            //TODO if we get an AIOOB, this is where is is fuycked with the slics.
+
+                            if (tempOrder.getSlices().size()==0)
+                                sendCancel(tempOrder.getOrderId(), -1, tempOrder.getSize(), tempOrder.getInstrument(), clientId);
+                            else{
+                                for (Order order : tempOrder.getSlices()){
+                                    sendCancel(tempOrder.getOrderId(), order.getOrderId(), tempOrder.getSize(), tempOrder.getInstrument(), clientId);
+
+                                }
+                            }
                             break;
                         default:
                             System.err.println("Method: "+methodName.toString()+" is not a valid method.");
@@ -130,7 +147,7 @@ public class SampleRouter extends Thread implements Router
     }
 
     @Override
-    public void sendCancel(int id, int sliceId, int size, Instrument i)
+    public void sendCancel(int id, int sliceId, int size, Instrument i, int clientId)
     {
         // MockI.show(""+order);
         // send the cancel signal in the output stream of something 'C' in sample client
@@ -138,13 +155,11 @@ public class SampleRouter extends Thread implements Router
         {
             /* THIS SHIT HASNT ACTUALLY BEEN IMPLEMENTED YET!*/
             os = new ObjectOutputStream(omConn.getOutputStream());
-            os.writeObject("bestPrice");
+            os.writeObject("orderCancelled");
             os.writeInt(id);
-            os.writeInt(sliceId);
-            os.writeInt(size);
-            os.writeObject(i);
-            // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
+            os.writeInt(clientId);
             os.flush();
+
         } catch (IOException e)
         {
             System.err.println("IOException occured in sendCancel, message: "+e.getMessage());

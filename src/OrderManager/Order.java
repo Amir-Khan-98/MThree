@@ -41,6 +41,12 @@ public class Order implements Serializable
 				'}';
 	}
 
+
+	public int getSize()
+	{
+		return size;
+	}
+
 	private ArrayList<Fill> fills;
 	private char OrdStatus = 'A'; //TODO OrdStatus is Fix 39, 'A' is 'Pending New'
 

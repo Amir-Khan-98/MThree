@@ -64,7 +64,7 @@ class MockClient extends Thread
                 {
                     client.sendOrder();
                     int id = client.sendOrder();
-                    // TODO client.sendCancel(id);
+                    client.sendCancel(id);
                     client.messageHandler();
                 }
                 else
