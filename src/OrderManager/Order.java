@@ -11,10 +11,10 @@ import Ref.Instrument;
 public class Order implements Serializable
 {
 
-	private final int orderId;
+	private int orderId;
 	public long orderRouter;
-	private final long clientOrderID;
-	private final int size;
+	private long clientOrderID;
+	private int size;
 	private long[] bestPrices;
 	private long bestPriceCount;
 
