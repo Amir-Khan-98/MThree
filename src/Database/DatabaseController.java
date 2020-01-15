@@ -1,32 +1,35 @@
 package Database;
 
 import OrderManager.Order;
-
 import java.sql.*;
 
 public class DatabaseController {
 
-    Connection connection;
-    String connectionString;
+    private static Connection connection;
 
-    public DatabaseController(String connection, String url, String username, String password) throws SQLException, ClassNotFoundException {
-        connectToDateBase(connection,url,username,password);
+    public DatabaseController(String connectionString, String url, String username, String password) throws SQLException, ClassNotFoundException {
+        connectToDatebase(connectionString,url,username,password);
     }
 
-    public void connectToDateBase(String connection, String url, String username, String password) throws ClassNotFoundException, SQLException {
-        Class.forName(connection);
+    public void connectToDatebase(String connectionString, String url, String username, String password) throws ClassNotFoundException, SQLException {
+        Class.forName(connectionString);
 
-        Connection conn = DriverManager.getConnection(url,username,password);
+        connection = DriverManager.getConnection(url,username,password);
     }
 
-    public void createDatabase() throws SQLException {
+    /**
+     * Creates a table of orders
+     *
+     * @throws SQLException
+     */
+    public void createOrderTable() throws SQLException {
         String createStatement = "create table orders(order_id int not null, client_order_id int not null, client_id int not null, ric varchar(30) not null, initial_market_price double not null,primary key (order_id));";
         PreparedStatement statementObj = connection.prepareStatement(createStatement);
         statementObj.executeUpdate();
         statementObj.close();
     }
 
-    public void addOrderToDatabase(Order o) throws SQLException {
+    public static void addOrderToTable(Order o) throws SQLException {
         String statement = "insert into orders values(?,?,?,?,?)";
         PreparedStatement addStatement = connection.prepareStatement(statement);
         addStatement.setInt(1,o.getOrderId());
@@ -42,5 +45,21 @@ public class DatabaseController {
             System.out.println("Record failed to add");
 
         addStatement.close();
+    }
+
+    public static void removeOrderFromTable(Order o) throws SQLException {
+        String statementString = "delete from orders where order_id = ?";
+        PreparedStatement deleteStatement = connection.prepareStatement(statementString);
+        deleteStatement.setInt(1,o.getOrderId());
+        deleteStatement.executeUpdate();
+    }
+
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }
