@@ -20,6 +20,7 @@ public class SampleClient extends Mock implements Client, Runnable
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
     private static final Map OUT_QUEUE = new HashMap(); // queue for outgoing orders
+    private static final Map fullOrders = new HashMap(); // queue for outgoing orders
     private int messageId = 0; // message id number
     private Socket omConn; // connection to order manager
 
@@ -85,8 +86,13 @@ public class SampleClient extends Mock implements Client, Runnable
     @Override
     public void fullyFilled(int orderId) {
 
-        //TODO fectch Orders here
+
         show("Fully Filled: " + OUT_QUEUE.get(orderId));
+
+
+        //TODO add fully filled orders here:
+
+        fullOrders.put(orderId, OUT_QUEUE.get(orderId));
         OUT_QUEUE.remove(orderId);
     }
 
@@ -154,7 +160,12 @@ public class SampleClient extends Mock implements Client, Runnable
 
                                 if (OrdStatus == 'C') cancelled(orderId);
                                 else if (OrdStatus == 'P') partialFill(orderId);
-                                else if (OrdStatus == 'F') fullyFilled(orderId);
+                                else if (OrdStatus == 'F') {
+
+                                    System.out.println("WOOOOOOOOOOOOT Client recieved a full order");
+                                    fullyFilled(orderId);
+
+                                }
                                 else if (OrdStatus == '0') //sendOrder();
                                 break;
                         }
@@ -162,7 +173,7 @@ public class SampleClient extends Mock implements Client, Runnable
                     if (whatToDo == methods.newOrderSingleAcknowledgement) {
                         newOrderSingleAcknowledgement(orderId);
                     }
-                    show("\nNEW ITERATION OF THE MESSAGE HANDLER\n");
+                    System.out.println("\n");
                 }
             }
         }
