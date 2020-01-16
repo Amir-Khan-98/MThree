@@ -147,9 +147,8 @@ public class OrderManager
                         case "newFill":
                             newFill(is.readInt(), is.readInt(), is.readInt(), is.readLong());
                             break;
-
                         case "orderCancelled":
-                            //TODO write the code to communicate to client
+                            //TODO remove the order from the OM
                             cancelOrder(is.readInt(), is.readInt());
                             break;
                         default:
@@ -280,6 +279,7 @@ public class OrderManager
 
         } catch (IOException e)
         {
+            System.out.println("IOException occurred in cancelOrder: "+e.getMessage());
             e.printStackTrace();
         }
     }
@@ -390,10 +390,9 @@ public class OrderManager
             }
         } catch (IOException e)
         {
+            System.out.println("IOException occurred in sendCancel: "+e.getMessage());
             e.printStackTrace();
         }
-
-
     }
 
     private void price(int orderId, Order o) throws IOException

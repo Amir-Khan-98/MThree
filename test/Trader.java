@@ -131,9 +131,9 @@ public class Trader extends Thread implements TradeScreen
         System.out.println("\nThe whole f****** orders map is here: " + orders+"\n");
 
         Thread.sleep(3000);
-        if(orders.containsKey( (int) o.getOrderId())) {
+        if(orders.containsKey(o.getOrderId())) {
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
-            sliceOrder(orderId, (int) orders.get( (int) o.getOrderId()).sizeRemaining() / 2);
+            sliceOrder(orderId, orders.get(o.getOrderId()).sizeRemaining() / 2);
         }
         else {
             System.out.println("Order with id: "+orderId+" doesnt exist in Trader: "+this.getName());

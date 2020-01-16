@@ -92,7 +92,7 @@ public class SampleClient extends Mock implements Client
     @Override
     public void cancelled(int orderId)
     {
-        System.out.println("CAAAAAANCCCCCEEEEEEEELLLLLL!!!!!!!!!!!!!! " + orderId );
+        System.out.println("Cancelled order: " + orderId );
         show("" + OUT_QUEUE.get(orderId));
         OUT_QUEUE.remove(orderId);
     }
@@ -172,7 +172,7 @@ public class SampleClient extends Mock implements Client
         {
             if(e.getClass() == IOException.class)
                 System.out.println("IOException occurred, message: "+e.getMessage());
-            if(e.getClass() == ClassNotFoundException.class)
+            else if(e.getClass() == ClassNotFoundException.class)
                 System.out.println("ClassNotFoundException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }

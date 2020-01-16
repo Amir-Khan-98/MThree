@@ -57,20 +57,19 @@ public class SampleRouter extends Thread implements Router
                             break;
                         case sendCancel:
                             // This currently has not implementation, but it should be called like this.
-
                             //TODO rewrite this to check the input and if the order exists
 
                             Order tempOrder = (Order) is.readObject();
                             int clientId = is.readInt();
 
-                            //TODO if we get an AIOOB, this is where is is fuycked with the slics.
+                            //TODO if we get an AIOOB, this is where is is fucked with the slices.
 
                             if (tempOrder.getSlices().size()==0)
                                 sendCancel(tempOrder.getOrderId(), -1, tempOrder.getSize(), tempOrder.getInstrument(), clientId);
                             else{
-                                for (Order order : tempOrder.getSlices()){
+                                for (Order order : tempOrder.getSlices())
+                                {
                                     sendCancel(tempOrder.getOrderId(), order.getOrderId(), tempOrder.getSize(), tempOrder.getInstrument(), clientId);
-
                                 }
                             }
                             break;
