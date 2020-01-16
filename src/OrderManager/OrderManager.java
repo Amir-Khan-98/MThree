@@ -3,6 +3,8 @@ package OrderManager;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import Database.Database;
 import LiveMarketData.LiveMarketData;
 import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
+import Ref.Instrument;
 import TradeScreen.TradeScreen;
 
 public class OrderManager
@@ -27,7 +30,7 @@ public class OrderManager
         boolean connected = false;
         int tryCounter = 0;
 
-        while (tryCounter < 600)
+        while (!connected && tryCounter < 600)
         {
             try {
                 Socket s = new Socket(location.getHostName(), location.getPort());
@@ -45,7 +48,7 @@ public class OrderManager
 
     public void createConnections(InetSocketAddress[] orderRouters, InetSocketAddress[] clients, InetSocketAddress trader, LiveMarketData liveMarketData) throws InterruptedException {
 
-        OrderManager.liveMarketData = liveMarketData;
+        this.liveMarketData = liveMarketData;
         this.trader = connect(trader);
         // for the router connections, copy the input array into our object field.
         // but rather than taking the address we create a socket+ephemeral port and connect it to the address
@@ -102,6 +105,16 @@ public class OrderManager
                             newOrder(clientId, is.readInt(), (NewOrderSingle) is.readObject());
                             break;
                         // create a default case which errors with "Unknown message type"+...
+                        case "sendCancel":
+                            // This currently has not implementation, but it should be called like this.
+
+                            // --- This needs to be turned into an order object and a router, then into the method.
+
+                            // THIS IS A TEST THIS MIGHT BREAK EVERYTHING
+                            int orderId2 = is.readInt();
+
+                            // where the fuck am i supposed to get this router from!?!?
+                            sendCancel(orders.get(orderId2), this.orderRouters, clientId);
                         default:
                             System.err.println("Unknown Message type!");
                             break;
@@ -122,18 +135,24 @@ public class OrderManager
                     switch (method)
                     { // determine the type of message and process it
                         case "bestPrice":
-                            int OrderId = is.readInt();
-                            int SliceId = is.readInt();
-                            Order slice = orders.get(OrderId).getSlices().get(SliceId);
+                            int orderId = is.readInt();
+                            int sliceId = is.readInt();
+                            Order slice = orders.get(orderId).getSlices().get(sliceId);
                             slice.getBestPrices()[routerId] = is.readLong();
                             slice.setBestPriceCount(slice.getBestPriceCount() + 1);
 
                             if (slice.getBestPriceCount() == slice.getBestPrices().length)
-                                reallyRouteOrder(SliceId, slice);
+                                reallyRouteOrder(sliceId, slice);
                             break;
                         case "newFill":
                             newFill(is.readInt(), is.readInt(), is.readInt(), is.readLong());
                             break;
+                        case "orderCancelled":
+                            //TODO remove the order from the OM
+                            cancelOrder(is.readInt(), is.readInt());
+                            break;
+                        default:
+                            System.err.println("(OrderManager)Method: "+method+" is not a valid method.");
                     }
                 }
             }
@@ -173,7 +192,6 @@ public class OrderManager
         sendOrderToTrader(tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
         // don't do anything else with the order, as we are simulating high touch orders and so need to wait for the trader to accept the order
-//        id++;
     }
 
     private void sendOrderToTrader(int orderId, Order o, Object method) throws IOException
@@ -232,7 +250,7 @@ public class OrderManager
     {
         for (Map.Entry<Integer, Order> entry : orders.entrySet())
         {
-            if (entry.getKey() == orderId)
+            if (entry.getKey().intValue() == orderId)
                 continue;
 
             Order matchingOrder = entry.getValue();
@@ -250,10 +268,20 @@ public class OrderManager
         }
     }
 
-    @SuppressWarnings("EmptyMethod")
-    private void cancelOrder()
+    private void cancelOrder(int orderId, int clientID)
     {
+        try
+        {
+            ObjectOutputStream os = new ObjectOutputStream(this.clients[clientID].getOutputStream());
 
+            os.writeObject("11=" + orderId + ";35=0;39=C;");
+            os.flush();
+
+        } catch (IOException e)
+        {
+            System.out.println("IOException occurred in cancelOrder: "+e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void newFill(int orderId, int sliceId, int size, double price) throws IOException
@@ -348,11 +376,23 @@ public class OrderManager
         os.flush();
     }
 
-    @SuppressWarnings("EmptyMethod")
-    private void sendCancel(Order order, Router orderRouter)
+    private void sendCancel(Order order, Socket[] orderRouter, int client)
     {
-        // orderRouter.sendCancel(order);
-        // order.orderRouter.writeObject(order);
+        try
+        {
+            for (Socket router : orderRouter)
+            {
+                ObjectOutputStream os = new ObjectOutputStream(router.getOutputStream()); // create an object outputstream, this is a pretty stupid way of doing it, why not create it once rather than every time around the loop
+                 os.writeObject(Router.api.sendCancel);
+                 os.writeObject(order);
+                 os.writeInt(client);
+                 os.flush();
+            }
+        } catch (IOException e)
+        {
+            System.out.println("IOException occurred in sendCancel: "+e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void price(int orderId, Order o) throws IOException

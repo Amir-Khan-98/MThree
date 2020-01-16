@@ -61,7 +61,19 @@ public class SampleClient extends Mock implements Client
 
         if (omConn.isConnected())
         {
-            // OMconnection.sendMessage("cancel",idToCancel);
+            try
+            {
+
+                ObjectOutputStream os = new ObjectOutputStream(omConn.getOutputStream());
+                os.writeObject("sendCancel");
+                //os.writeObject("35=D;");
+                os.writeInt(idToCancel);
+                os.flush();
+            } catch (IOException e)
+            {
+                System.out.println("Cant send message");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -83,6 +95,7 @@ public class SampleClient extends Mock implements Client
     @Override
     public void cancelled(int orderId)
     {
+        System.out.println("Cancelled order: " + orderId );
         show("" + OUT_QUEUE.get(orderId));
         OUT_QUEUE.remove(orderId);
     }
@@ -95,7 +108,6 @@ public class SampleClient extends Mock implements Client
     @Override
     public void messageHandler()
     {
-
         ObjectInputStream is;
         try
         {
@@ -159,7 +171,7 @@ public class SampleClient extends Mock implements Client
         {
             if(e.getClass() == IOException.class)
                 System.out.println("IOException occurred, message: "+e.getMessage());
-            if(e.getClass() == ClassNotFoundException.class)
+            else if(e.getClass() == ClassNotFoundException.class)
                 System.out.println("ClassNotFoundException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }

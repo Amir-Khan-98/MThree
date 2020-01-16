@@ -6,6 +6,8 @@ import java.util.Random;
 
 import javax.net.ServerSocketFactory;
 
+import OrderClient.Client;
+import OrderManager.Order;
 import OrderRouter.Router;
 import Ref.Instrument;
 import Ref.Ric;
@@ -57,6 +59,26 @@ public class SampleRouter extends Thread implements Router
                         case priceAtSize:
                             priceAtSize(is.readInt(), is.readInt(), (Instrument) is.readObject(), is.readInt());
                             break;
+                        case sendCancel:
+                            // This currently has not implementation, but it should be called like this.
+                            //TODO rewrite this to check the input and if the order exists
+
+                            Order tempOrder = (Order) is.readObject();
+                            int clientId = is.readInt();
+
+                            //TODO if we get an AIOOB, this is where is is fucked with the slices.
+
+                            if (tempOrder.getSlices().size()==0)
+                                sendCancel(tempOrder.getOrderId(), -1, tempOrder.getSize(), tempOrder.getInstrument(), clientId);
+                            else{
+                                for (Order order : tempOrder.getSlices())
+                                {
+                                    sendCancel(tempOrder.getOrderId(), order.getOrderId(), tempOrder.getSize(), tempOrder.getInstrument(), clientId);
+                                }
+                            }
+                            break;
+                        default:
+                            System.err.println("Method: "+methodName.toString()+" is not a valid method.");
                     }
                 }
                 else
@@ -128,8 +150,26 @@ public class SampleRouter extends Thread implements Router
     }
 
     @Override
-    public void sendCancel(int id, int sliceId, int size, Instrument i)
-    { // MockI.show(""+order);
+    public void sendCancel(int id, int sliceId, int size, Instrument i, int clientId)
+    {
+        // MockI.show(""+order);
+        // send the cancel signal in the output stream of something 'C' in sample client
+        try
+        {
+            /* THIS SHIT HASNT ACTUALLY BEEN IMPLEMENTED YET!*/
+            os = new ObjectOutputStream(omConn.getOutputStream());
+            os.writeObject("orderCancelled");
+            os.writeInt(id);
+            os.writeInt(clientId);
+            os.flush();
+
+        } catch (IOException e)
+        {
+            System.err.println("IOException occured in sendCancel, message: "+e.getMessage());
+            e.printStackTrace();
+        }
+
+
     }
 
     public static Instrument[] getINSTRUMENTS() {
