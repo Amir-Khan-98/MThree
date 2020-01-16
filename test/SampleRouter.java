@@ -60,13 +60,10 @@ public class SampleRouter extends Thread implements Router
                             priceAtSize(is.readInt(), is.readInt(), (Instrument) is.readObject(), is.readInt());
                             break;
                         case sendCancel:
-                            // This currently has not implementation, but it should be called like this.
                             //TODO rewrite this to check the input and if the order exists
 
                             Order tempOrder = (Order) is.readObject();
                             int clientId = is.readInt();
-
-                            //TODO if we get an AIOOB, this is where is is fucked with the slices.
 
                             if (tempOrder.getSlices().size()==0)
                                 sendCancel(tempOrder.getOrderId(), -1, tempOrder.getSize(), tempOrder.getInstrument(), clientId);
@@ -168,8 +165,6 @@ public class SampleRouter extends Thread implements Router
             System.err.println("IOException occured in sendCancel, message: "+e.getMessage());
             e.printStackTrace();
         }
-
-
     }
 
     public static Instrument[] getINSTRUMENTS() {

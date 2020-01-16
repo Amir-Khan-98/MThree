@@ -82,9 +82,9 @@ public class Trader extends Thread implements TradeScreen
         {
             if(e.getClass() == IOException.class)
                 System.out.println("IOException occurred, message: "+e.getMessage());
-            if(e.getClass() == ClassNotFoundException.class)
+            else if(e.getClass() == ClassNotFoundException.class)
                 System.out.println("ClassNotFoundException occurred, message: "+e.getMessage());
-            if(e.getClass() == InterruptedException.class)
+            else if(e.getClass() == InterruptedException.class)
                 System.out.println("InterruptedException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }

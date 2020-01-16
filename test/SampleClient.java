@@ -58,12 +58,10 @@ public class SampleClient extends Mock implements Client
     public void sendCancel(int idToCancel)
     {
         show("sendCancel: id=" + idToCancel);
-
         if (omConn.isConnected())
         {
             try
             {
-
                 ObjectOutputStream os = new ObjectOutputStream(omConn.getOutputStream());
                 os.writeObject("sendCancel");
                 //os.writeObject("35=D;");
@@ -124,7 +122,6 @@ public class SampleClient extends Mock implements Client
                     char MsgType;
                     int OrdStatus;
                     methods whatToDo = methods.dontKnow;
-                    // String[][] fixTagsValues=new String[fixTags.length][2];
 
                     for (String fixTag : fixTags) {
                         String[] tag_value = fixTag.split("=");
@@ -155,16 +152,8 @@ public class SampleClient extends Mock implements Client
                     if (whatToDo == methods.newOrderSingleAcknowledgement) {
                         newOrderSingleAcknowledgement(orderId);
                     }
-					
-//					message=connection.getMessage();
-//					char type;
-//					switch(type){
-//
-//					}
                     show("");
                 }
-
-
             }
         }
         catch (IOException | ClassNotFoundException e)
