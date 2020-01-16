@@ -188,7 +188,7 @@ public class OrderManager
         os.writeObject("11=" + clientOrderId + ";35=A;39=A;");
         os.flush();
 
-        System.out.println("\n" + orders + "\n"); // Might be worth making a method to print this out so that its a bit more readable, but not necessary
+//        System.out.println("\n" + orders + "\n"); // Might be worth making a method to print this out so that its a bit more readable, but not necessary
 
         sendOrderToTrader(tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
@@ -287,8 +287,8 @@ public class OrderManager
 
     private void newFill(int orderId, int sliceId, int size, double price) throws IOException
     {
-        System.out.println("The incoming orderId: " + orderId);
-        System.out.println("The Orders Array is!" +orders);
+//        System.out.println("The incoming orderId: " + orderId);
+//        System.out.println("The Orders Array is!" +orders);
         if(orders.containsKey(orderId))
         {
             Order o = orders.get(orderId);
@@ -313,7 +313,7 @@ public class OrderManager
                     // If the inner order (the slice) is what we are looking for.
                     if(innerOrder.getOrderId() == orderId)
                     {
-                        System.out.println("Found the order inside another order!" + innerOrder.toString()+ " Sliceid: "+sliceId);
+//                        System.out.println("Found the order inside another order!" + innerOrder.toString()+ " Sliceid: "+sliceId);
                         order.getSlices().get(sliceId).createFill(size, price);
 
                         if (innerOrder.sizeRemaining() == 0)

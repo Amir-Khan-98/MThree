@@ -130,7 +130,7 @@ public class Trader extends Thread implements TradeScreen
         // TODO should update the trade screen
         // TradeScreen.api....
 
-        System.out.println("\nThe whole f****** orders map is here: " + orders+"\n");
+//        System.out.println("\nThe whole f****** orders map is here: " + orders+"\n");
 
         Thread.sleep(3000);
         if(orders.containsKey(o.getOrderId())) {

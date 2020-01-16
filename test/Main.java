@@ -43,11 +43,13 @@ public class Main
 class MockClient extends Thread
 {
     final int port;
+    private String name;
 
     MockClient(String name, int port)
     {
         this.port = port;
         this.setName(name);
+        this.name = name;
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -61,17 +63,28 @@ class MockClient extends Thread
             e.printStackTrace();
         }
 
-        while(true) {
             try {
                 if (port == 2000) {
                     // done "why does this take an arg?"
+
+                    Thread t = new Thread(client);
+                    t.setName(this.name + " MESSAGE HANDLER");
+                    t.start();
+
                     Objects.requireNonNull(client).sendOrder();
                     int id = client.sendOrder();
+
+                    System.out.println("WE ARE CANCELIUNG THE ORDER HERE!!!!");
                     client.sendCancel(id);
-                    client.messageHandler();
+
+
+
                 } else {
+                    Thread t = new Thread(client);
+                    t.start();
+                    t.setName(this.name + " MESSAGE HANDLER");
                     Objects.requireNonNull(client).sendOrder();
-                    client.messageHandler();
+//                    client.messageHandler();
                 }
             } catch (IOException e) {
                 System.out.println("IOException Occured. Message: " + e.getMessage());
@@ -83,7 +96,18 @@ class MockClient extends Thread
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }
+
+            while(true){
+                try {
+                    sleep(3000);
+
+                    client.sendOrder();
+
+                } catch (InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
     }
 }
 
