@@ -84,7 +84,7 @@ public class OrderManager
         // main loop, wait for a message, then process it
         while (true) {
 
-            Thread.sleep(2000); // Just chill for a bit, make the output a bit more manageable.
+            Thread.sleep(500); // Just chill for a bit, make the output a bit more manageable.
 
             //CLIENTS
             for (clientId = 0; clientId < this.clients.length; clientId++)
@@ -172,8 +172,14 @@ public class OrderManager
                         break;
                     case "sliceOrder":
                         sliceOrder(is.readInt(), is.readInt());
+                        break;
+                    case "orderFilled":
+                        sendFilledOrderToClient(is.readInt(), (Order) is.readObject());
+                        break;
                 }
             }
+
+
         }
     }
 
@@ -188,7 +194,7 @@ public class OrderManager
         os.writeObject("11=" + clientOrderId + ";35=A;39=A;");
         os.flush();
 
-        System.out.println("\n" + orders + "\n"); // Might be worth making a method to print this out so that its a bit more readable, but not necessary
+//        System.out.println("\n" + orders + "\n"); // Might be worth making a method to print this out so that its a bit more readable, but not necessary
 
         sendOrderToTrader(tempOrder.getOrderId(), tempOrder, TradeScreen.api.newOrder);
         // send the new order to the trading screen
@@ -203,6 +209,7 @@ public class OrderManager
         ost.writeObject(o);
         ost.flush();
     }
+
 
     public void acceptOrder(int orderId) throws IOException
     {
@@ -235,7 +242,7 @@ public class OrderManager
             return;
         }
 
-        //TODO JP Is rewritring the following:
+
         int sliceId = o.newSlice(sliceSize);
         Order slice = o.getSlices().get(sliceId);
         internalCross(orderId, slice);
@@ -287,8 +294,8 @@ public class OrderManager
 
     private void newFill(int orderId, int sliceId, int size, double price) throws IOException
     {
-        System.out.println("The incoming orderId: " + orderId);
-        System.out.println("The Orders Array is!" +orders);
+//        System.out.println("The incoming orderId: " + orderId);
+//        System.out.println("The Orders Array is!" +orders);
         if(orders.containsKey(orderId))
         {
             Order o = orders.get(orderId);
@@ -296,7 +303,8 @@ public class OrderManager
 
             if (o.sizeRemaining() == 0)
             {
-                Database.write(o);
+                System.out.println("THE THINGY IS FULL");
+                //TODO Database.write(o);
             }
 
             sendOrderToTrader(orderId, o, TradeScreen.api.fill);
@@ -313,12 +321,13 @@ public class OrderManager
                     // If the inner order (the slice) is what we are looking for.
                     if(innerOrder.getOrderId() == orderId)
                     {
-                        System.out.println("Found the order inside another order!" + innerOrder.toString()+ " Sliceid: "+sliceId);
+//                        System.out.println("Found the order inside another order!" + innerOrder.toString()+ " Sliceid: "+sliceId);
                         order.getSlices().get(sliceId).createFill(size, price);
 
                         if (innerOrder.sizeRemaining() == 0)
                         {
-                            Database.write(innerOrder);
+                            System.out.println("THE THINGY IS FULL2");
+                            //TODO Database.write(innerOrder);
                         }
 
                         sendOrderToTrader(orderId, innerOrder, TradeScreen.api.fill);
@@ -332,7 +341,7 @@ public class OrderManager
     {
         for (Socket r : orderRouters)
         {
-            //TODO JP Is rewritring the following:
+
             ObjectOutputStream os = new ObjectOutputStream(r.getOutputStream());
             os.writeObject(Router.api.priceAtSize);
             os.writeInt(orderId);
@@ -375,6 +384,22 @@ public class OrderManager
         os.writeInt(o.sizeRemaining());
         os.writeObject(o.getInstrument());
         os.flush();
+    }
+
+    private void sendFilledOrderToClient(int orderId, Order o){
+        try {
+            ObjectOutputStream os = new ObjectOutputStream(this.clients[(int)o.getClientId()].getOutputStream());
+
+            System.out.println("Sending to client: " + o.getClientId());
+
+            os.writeObject("11=" + o.getClientOrderID() + ";35=0;39=F;");
+            os.flush();
+
+        } catch (IOException e) {
+            System.out.println("IOException occurred in cancelOrder: "+e.getMessage());
+            e.printStackTrace();
+        }
+
     }
 
     private void sendCancel(Order order, Socket[] orderRouter, int client)

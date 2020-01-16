@@ -11,17 +11,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import OrderClient.Client;
 import OrderClient.NewOrderSingle;
+import OrderManager.Order;
 import Ref.Instrument;
 import Ref.Ric;
 
 @SuppressWarnings("InfiniteLoopStatement")
-public class SampleClient extends Mock implements Client
+public class SampleClient extends Mock implements Client, Runnable
 {
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
-    private static final Map OUT_QUEUE = new HashMap(); // queue for outgoing orders
-    private final AtomicInteger messageId = new AtomicInteger( 0); // message id number
+    private final Map OUT_QUEUE = new HashMap(); // queue for outgoing orders
+    private final Map fullOrders = new HashMap(); // queue for outgoing orders
+    private int messageId = 0; // message id number
     private Socket omConn; // connection to order manager
+    private int uniqueClientID;
+
+    public int getUniqueClientID() {
+        return uniqueClientID;
+    }
+
+    public void setUniqueClientID(int uniqueClientID) {
+        this.uniqueClientID = uniqueClientID;
+    }
 
     public SampleClient(int port) throws IOException
     {
@@ -47,11 +58,11 @@ public class SampleClient extends Mock implements Client
             ObjectOutputStream os = new ObjectOutputStream(omConn.getOutputStream());
             os.writeObject("newOrderSingle");
             //os.writeObject("35=D;");
-            os.writeInt(messageId.get());
+            os.writeInt(messageId);
             os.writeObject(nos);
             os.flush();
         }
-        return messageId.incrementAndGet();
+        return messageId++;
     }
 
     @Override
@@ -78,15 +89,22 @@ public class SampleClient extends Mock implements Client
     @Override
     public void partialFill(int orderId)
     {
-        show("" + OUT_QUEUE.get(orderId));
+        show("Partial Fill: " + OUT_QUEUE.get(orderId));
         OUT_QUEUE.remove(orderId);
     }
 
     @Override
     public void fullyFilled(int orderId) {
 
-        //TODO fectch Orders here
-        show("" + OUT_QUEUE.get(orderId));
+
+        show("Fully Filled: " + OUT_QUEUE.get(orderId));
+
+        System.out.println(OUT_QUEUE);
+
+
+        //TODO add fully filled orders here:
+
+        fullOrders.put(orderId, OUT_QUEUE.get(orderId));
         OUT_QUEUE.remove(orderId);
     }
 
@@ -94,13 +112,23 @@ public class SampleClient extends Mock implements Client
     public void cancelled(int orderId)
     {
         System.out.println("Cancelled order: " + orderId );
-        show("" + OUT_QUEUE.get(orderId));
+
+        System.out.println(" THE OUT QUEUE: " + OUT_QUEUE);
+
+        System.out.println("Does it contain order: " + OUT_QUEUE.containsKey(orderId));
+
+        show(" Cancelled " + OUT_QUEUE.get(orderId));
         OUT_QUEUE.remove(orderId);
     }
 
     enum methods
     {
         newOrderSingleAcknowledgement, dontKnow
+    }
+
+    @Override
+    public void run() {
+        messageHandler();
     }
 
     @Override
@@ -126,7 +154,7 @@ public class SampleClient extends Mock implements Client
                     for (String fixTag : fixTags) {
                         String[] tag_value = fixTag.split("=");
 
-                        System.out.println(Arrays.toString(tag_value));
+//                        System.out.println(Arrays.toString(tag_value));
 
 
                         switch (tag_value[0]) {
@@ -140,19 +168,24 @@ public class SampleClient extends Mock implements Client
                             case "39":
                                 OrdStatus = tag_value[1].charAt(0);
 
-                                System.out.println(OrdStatus);
+//                                System.out.println(OrdStatus);
 
                                 if (OrdStatus == 'C') cancelled(orderId);
                                 else if (OrdStatus == 'P') partialFill(orderId);
-                                else if (OrdStatus == 'F') fullyFilled(orderId);
-                                else if (OrdStatus == '0') sendOrder();
+                                else if (OrdStatus == 'F') {
+
+                                    System.out.println("WOOOOOOOOOOOOT Client recieved a full order");
+                                    fullyFilled(orderId);
+
+                                }
+                                else if (OrdStatus == '0') //sendOrder();
                                 break;
                         }
                     }
                     if (whatToDo == methods.newOrderSingleAcknowledgement) {
                         newOrderSingleAcknowledgement(orderId);
                     }
-                    show("");
+                    System.out.println("\n");
                 }
             }
         }
@@ -166,7 +199,7 @@ public class SampleClient extends Mock implements Client
         }
     }
 
-    void newOrderSingleAcknowledgement(int OrderId)
+    void  newOrderSingleAcknowledgement(int OrderId)
     {
         System.out.println(Thread.currentThread().getName() + " called newOrderSingleAcknowledgement");
         // do nothing, as not recording so much state in the NOS class at present

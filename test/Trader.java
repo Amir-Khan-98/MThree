@@ -40,7 +40,7 @@ public class Trader extends Thread implements TradeScreen
                 // s.available returns the estimated number of bytes to be read.
                 if (0 < s.available())
                 {
-                    is = new ObjectInputStream(s);  // TODO check if we need to create each time. this will block if no data, but maybe we can still try to create it once instead of repeatedly
+                    is = new ObjectInputStream(s);
 
                     // Reads in the message from the stream.
                     api method = (api) is.readObject();
@@ -64,9 +64,8 @@ public class Trader extends Thread implements TradeScreen
                             // We need to create the cross(is.readInt(), (Order) is.readObject()) method to be used here.
                             break; // TODO
                         case fill:
-                            is.readInt();
-                            is.readObject();
-                            // We need to create the fill(is.readInt(), (Order) is.readObject()) method to be used here.
+                            System.out.println("We are ATTTTTTTTEMPTING TO FILL");
+                            fill(is.readInt(), (Order) is.readObject());
                             break; // TODO
                     }
                 }
@@ -74,7 +73,7 @@ public class Trader extends Thread implements TradeScreen
                 else
                 {
                     System.out.println("Trader Waiting for data to be available - sleep 1s");
-                    Thread.sleep(2000);
+                    Thread.sleep(100);
                 }
             }
         }
@@ -88,6 +87,27 @@ public class Trader extends Thread implements TradeScreen
                 System.out.println("InterruptedException occurred, message: "+e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public void fill(int orderId, Order o){
+        //TODO this is a test to see if fill is working
+        //We are filling the order fully
+        //Later, we can implement portions of orders filled at once
+
+        o.createFill(o.sizeRemaining(), o.getInstrument().getUnitPrice());
+
+        try {
+            os = new ObjectOutputStream(omConn.getOutputStream());
+            os.writeObject("orderFilled");
+            os.writeInt(orderId);
+            os.writeObject(o);
+            os.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
     }
 
     @Override
@@ -107,7 +127,6 @@ public class Trader extends Thread implements TradeScreen
         os.writeObject("acceptOrder");
         os.writeInt(id);
 
-        // .flush() writes all the bytes in the os buffer to their destination, presumably clearing the buffer.
         os.flush();
     }
 
@@ -130,9 +149,9 @@ public class Trader extends Thread implements TradeScreen
         // TODO should update the trade screen
         // TradeScreen.api....
 
-        System.out.println("\nThe whole f****** orders map is here: " + orders+"\n");
+        System.out.println("\nThe whole orders map is here: " + orders+"\n");
 
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         if(orders.containsKey(o.getOrderId())) {
             // TODO this is to prevent order.get returning null, but that might not be the actual problem.
             sliceOrder(orderId, orders.get(o.getOrderId()).sizeRemaining() / 2);
