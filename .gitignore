@@ -57,3 +57,4 @@
 *.class
 /.idea/uiDesigner.xml
 /.idea/dictionaries/jpb.xml
+/out/production/MThreeGroupProject/META-INF/MThreeGroupProject.kotlin_module

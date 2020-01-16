@@ -115,6 +115,7 @@ public class OrderManager
 
                             // where the fuck am i supposed to get this router from!?!?
                             sendCancel(orders.get(orderId2), this.orderRouters, clientId);
+                            break;
                         default:
                             System.err.println("Unknown Message type!");
                             break;

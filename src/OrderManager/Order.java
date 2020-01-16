@@ -276,6 +276,13 @@ public class Order implements Serializable
 		return slices;
 	}
 
+	public long getClientOrderID() {
+		return clientOrderID;
+	}
+
+	public double getInitialMarketPrice() {
+		return 0.0;
+	}
 }
 
 class Basket
