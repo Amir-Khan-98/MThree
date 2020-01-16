@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import OrderClient.Client;
 import OrderClient.NewOrderSingle;
+import OrderManager.Order;
 import Ref.Instrument;
 import Ref.Ric;
 
@@ -19,10 +20,19 @@ public class SampleClient extends Mock implements Client, Runnable
 {
     private static final Random RANDOM_NUM_GENERATOR = new Random();
     private static final Instrument[] INSTRUMENTS = {new Instrument(new Ric("VOD.L")), new Instrument(new Ric("BP.L")), new Instrument(new Ric("BT.L"))};
-    private static final Map OUT_QUEUE = new HashMap(); // queue for outgoing orders
-    private static final Map fullOrders = new HashMap(); // queue for outgoing orders
+    private final Map OUT_QUEUE = new HashMap(); // queue for outgoing orders
+    private final Map fullOrders = new HashMap(); // queue for outgoing orders
     private int messageId = 0; // message id number
     private Socket omConn; // connection to order manager
+    private int uniqueClientID;
+
+    public int getUniqueClientID() {
+        return uniqueClientID;
+    }
+
+    public void setUniqueClientID(int uniqueClientID) {
+        this.uniqueClientID = uniqueClientID;
+    }
 
     public SampleClient(int port) throws IOException
     {
@@ -88,6 +98,8 @@ public class SampleClient extends Mock implements Client, Runnable
 
 
         show("Fully Filled: " + OUT_QUEUE.get(orderId));
+
+        System.out.println(OUT_QUEUE);
 
 
         //TODO add fully filled orders here:

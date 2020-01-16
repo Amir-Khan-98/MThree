@@ -303,7 +303,8 @@ public class OrderManager
 
             if (o.sizeRemaining() == 0)
             {
-                //Database.write(o);
+                System.out.println("THE THINGY IS FULL");
+                //TODO Database.write(o);
             }
 
             sendOrderToTrader(orderId, o, TradeScreen.api.fill);
@@ -325,7 +326,8 @@ public class OrderManager
 
                         if (innerOrder.sizeRemaining() == 0)
                         {
-                            Database.write(innerOrder);
+                            System.out.println("THE THINGY IS FULL2");
+                            //TODO Database.write(innerOrder);
                         }
 
                         sendOrderToTrader(orderId, innerOrder, TradeScreen.api.fill);
@@ -388,7 +390,9 @@ public class OrderManager
         try {
             ObjectOutputStream os = new ObjectOutputStream(this.clients[(int)o.getClientId()].getOutputStream());
 
-            os.writeObject("11=" + orderId + ";35=0;39=F;");
+            System.out.println("Sending to client: " + o.getClientId());
+
+            os.writeObject("11=" + o.getClientOrderID() + ";35=0;39=F;");
             os.flush();
 
         } catch (IOException e) {

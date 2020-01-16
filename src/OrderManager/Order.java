@@ -19,9 +19,19 @@ public class Order implements Serializable
 	private long bestPriceCount;
 
 	private long clientId;
+
+	private int clientUniqueID;
 	private Instrument instrument;
 	public double unitPrice;
 	private ArrayList<Order> slices;
+
+	public int getClientUniqueID() {
+		return clientUniqueID;
+	}
+
+	public void setClientUniqueID(int clientUniqueID) {
+		this.clientUniqueID = clientUniqueID;
+	}
 
 	@Override
 	public String toString() {
@@ -76,7 +86,7 @@ public class Order implements Serializable
 
 	public int newSlice(int sliceSize)
 	{
-		slices.add(new Order(orderId, clientOrderID, instrument, sliceSize));
+		slices.add(new Order(clientId, clientOrderID, instrument, sliceSize));
 		return slices.size() - 1;
 	}
 

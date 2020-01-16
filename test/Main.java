@@ -66,6 +66,7 @@ class MockClient extends Thread
             try {
                 if (port == 2000) {
                     // done "why does this take an arg?"
+                    client.setUniqueClientID(0);
 
                     Thread t = new Thread(client);
                     t.setName(this.name + " MESSAGE HANDLER");
@@ -80,6 +81,7 @@ class MockClient extends Thread
 
 
                 } else {
+                    client.setUniqueClientID(1);
                     Thread t = new Thread(client);
                     t.start();
                     t.setName(this.name + " MESSAGE HANDLER");
