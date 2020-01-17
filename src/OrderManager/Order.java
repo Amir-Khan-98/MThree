@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import Database.OrderController;
 import Ref.Instrument;
 
 //Testing Braches and merging
@@ -86,7 +87,11 @@ public class Order implements Serializable
 
 	public int newSlice(int sliceSize)
 	{
-		slices.add(new Order(clientId, clientOrderID, instrument, sliceSize));
+
+		Order temoOderSlice = new Order(clientId, clientOrderID, instrument, sliceSize);
+		OrderController.addOrderToTable(temoOderSlice);
+		slices.add(temoOderSlice);
+
 		return slices.size() - 1;
 	}
 

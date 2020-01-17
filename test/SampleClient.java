@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import Database.FixController;
 import OrderClient.Client;
 import OrderClient.NewOrderSingle;
 import OrderManager.Order;
@@ -144,6 +145,7 @@ public class SampleClient extends Mock implements Client, Runnable
                 {
                     is = new ObjectInputStream(omConn.getInputStream());
                     String fix = (String) is.readObject();
+                    FixController.addFixMessageToTable(fix);
                     System.out.println(Thread.currentThread().getName() + " received fix message: " + fix);
                     String[] fixTags = fix.split(";");
                     int orderId = -1;

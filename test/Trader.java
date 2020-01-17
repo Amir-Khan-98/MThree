@@ -73,7 +73,7 @@ public class Trader extends Thread implements TradeScreen
                 else
                 {
                     System.out.println("Trader Waiting for data to be available - sleep 1s");
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 }
             }
         }

@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-import Database.Database;
+import Database.*;
 import LiveMarketData.LiveMarketData;
 import OrderClient.NewOrderSingle;
 import OrderRouter.Router;
@@ -84,7 +84,7 @@ public class OrderManager
         // main loop, wait for a message, then process it
         while (true) {
 
-            Thread.sleep(500); // Just chill for a bit, make the output a bit more manageable.
+            Thread.sleep(2000); // Just chill for a bit, make the output a bit more manageable.
 
             //CLIENTS
             for (clientId = 0; clientId < this.clients.length; clientId++)
@@ -185,6 +185,9 @@ public class OrderManager
 
     private void newOrder(int clientId, int clientOrderId, NewOrderSingle nos) throws IOException {
         Order tempOrder = new Order(clientId, clientOrderId, nos.instrument, nos.size);
+
+        OrderController.addOrderToTable(tempOrder);
+
         orders.put(tempOrder.getOrderId(), tempOrder);
         // send a message to the client with 39=A;
         // OrdStatus is Fix 39, 'A' is 'Pending New'

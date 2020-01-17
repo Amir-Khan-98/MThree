@@ -1,22 +1,44 @@
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import Database.*;
 import LiveMarketData.LiveMarketData;
 import OrderManager.OrderManager;
 
 public class Main
 {
-    public static void main(String[] args) throws IOException
-    {
+    public static void main(String[] args) throws IOException, SQLException, ClassNotFoundException {
+
+        DatabaseController dbc = new DatabaseController("com.mysql.jdbc.Driver","jdbc:mysql://192.168.64.2/marketdatabase","root","");
+        Connection databaseConnection = dbc.getConnection();
+        ClientsController clientsController = new ClientsController(databaseConnection);
+        OrderController orderController = new OrderController(databaseConnection);
+        FixController fixController = new FixController(databaseConnection);
+
+        FixController.removeRowsFromTable();
+        OrderController.removeRowsFromTable();
+
+
+//        ClientsController.createClientsTable();
+////        OrderController.createOrderTable();
+////        FixController.createFixTable();
+
+
+
         System.out.println("TEST: this program tests ordermanager");
 
         // start sample clients
         MockClient c1 = new MockClient("Client 1", 2000);
         c1.start();
         (new MockClient("Client 2", 2001)).start();
+
+//        ClientsController.addClient(0, 2000);
+//        ClientsController.addClient(1, 2001);
 
         // start sample routers
         (new SampleRouter("Router LSE", 2010)).start();
@@ -101,7 +123,7 @@ class MockClient extends Thread
 
             while(true){
                 try {
-                    sleep(3000);
+                    sleep(5000);
 
                     client.sendOrder();
 
